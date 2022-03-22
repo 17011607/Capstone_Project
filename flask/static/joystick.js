@@ -60,6 +60,21 @@
             }
         }
     }
+
+    async function request( coordX, coordY ) {
+        let user = {
+            x: coordX,
+            y: coordY
+          };
+        const response = await fetch('/joystick',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(user)
+        });
+      }
     
     jqWindow
         .on( onDesktop ? "mousemove" : "touchmove", winMove )
@@ -223,7 +238,7 @@
                     Math.sin( a ) * d,
                     rx, ry
                 );
-                console.log(this.coordX, this.coordY)
+                request(this.coordX, this.coordY);
             },
             release: function() {
                 this.isHolding = false;
