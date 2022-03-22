@@ -21,6 +21,13 @@ def command():
     cmd=request.form.get('command')
     return jsonify(status='success'), 200
 
+@app.route('/joystick', methods=['POST'])
+def joystick():
+    print(request.is_json)
+    params = request.get_json()
+    print(f"x : {params['x']}, y : {params['y']}")
+    return 'ok'
+
 '''
 @app.route('/setting/')
 def controller():
