@@ -60,6 +60,16 @@
             }
         }
     }
+
+    var request=(command,coordX,coordY,params={})=>{
+        console.log({action:'sendCommand',command:command,params:params})   
+        params['command']=command
+        params['coordX'] = coordX;
+        params['coordY'] = coordY;
+        $.post("/api/command/",params).done((json)=>{
+            console.log({action:'sendCommand',json:json})
+        },'json')
+    }
     
     jqWindow
         .on( onDesktop ? "mousemove" : "touchmove", winMove )
@@ -223,7 +233,7 @@
                     Math.sin( a ) * d,
                     rx, ry
                 );
-                console.log(this.coordX, this.coordY)
+                request("move",this.coordX, this.coordY);
             },
             release: function() {
                 this.isHolding = false;

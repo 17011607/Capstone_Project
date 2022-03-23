@@ -2,8 +2,20 @@
 {% block content %}
 <style>
     .controller-box{
+        position:relative;
         text-align: center;
     }     
+
+    .controller-box .joystick_interface{
+        position:absolute;
+        left:5px;
+        top:190px;
+    }
+
+    .controller-box .menu{
+        position:absolute;
+        left:5px;
+    }
 </style>
 <script src="//code.jquery.com/jquery-3.0.0-alpha1.min.js"></script>
 <script src="../static/js/joystick_elements.js"></script>
@@ -30,13 +42,20 @@
 </div>
 
 <div class="controller-box">
+    <img src="../static/images/video_view.jpg" style="float:left; width:660px;height:300px;">
     <div data-role="controlgroup" data-type="horizontal">
         <a href="#" data-role="button" onclick="sendCommand('takeOff'); return false">Take Off</a>
         <a href="#" data-role="button" onclick="sendCommand('land'); return false">Land</a>
     </div>
+
+    <div class="joystick_interface" style="display:flex; float:left;">
+        <div data-jquery-element="joystick"></div>
+    </div>
+
+    <div class="menu">
+        <button class="menu" type="button"><img src="../static/images/icons-png/bars-black.png"></button>
+    </div>
 </div>
 
-<div style="display:flex; justify-content:center;">
-    <div data-jquery-element="joystick"></div>
-</div>
+
 {% endblock %}

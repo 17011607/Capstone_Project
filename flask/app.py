@@ -18,15 +18,8 @@ def controller():
 
 @app.route('/api/command/', methods=['POST'])
 def command():
-    cmd=request.form.get('command')
+    cmd=request.form.get('command') # move commnad 시 coordX, coordY 매개변수도 같이 전달됨
     return jsonify(status='success'), 200
-
-@app.route('/joystick', methods=['POST'])
-def joystick():
-    print(request.is_json)
-    params = request.get_json()
-    print(f"x : {params['x']}, y : {params['y']}")
-    return 'ok'
 
 '''
 @app.route('/setting/')
