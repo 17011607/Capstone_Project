@@ -11,50 +11,7 @@
         left:5px;
         top:190px;
     }
-
-    .controller-box .menu{
-        position:absolute;
-        left:5px;
-    }
-    .sidenav{
-        height: 100%;
-        width: 0;
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        background-color: #111;
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 60px;
-    }
-    .sidenav a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-    }
-
-    .sidenav a:hover {
-        color: #f1f1f1;
-    }
-
-    .sidenav .closebtn {
-        position: absolute;
-        top: 0;
-        right: 25px;
-        font-size: 36px;
-        margin-left: 50px;
-    }
-
-    @media screen and (max-height: 450px) {
-    .sidenav {padding-top: 15px;}
-    .sidenav a {font-size: 18px;}
-    }
 </style>
-<script src="//code.jquery.com/jquery-3.0.0-alpha1.min.js"></script>
 <script src="../static/js/joystick_elements.js"></script>
 <script src="../static/js/joystick.js"></script>
 <script>
@@ -73,33 +30,26 @@
             release: function() {}
         });
     });
-    
-    function openNav(){
-        document.getElementById("mySidenav").style.width = "250px";
-    }
-
-    function closeNav(){
-        document.getElementById("mySidenav").style.width="0";
-    }
 </script>
 <div class="controller-box">
     <h1>Remote Controller</h1>
 </div>
 
 <div class="controller-box">
-    <img src="../static/images/video_view.jpg" style="float:left; width:660px;height:300px;">
-    <div id="mySidenav" class="sidenav" data-role="controlgroup" data-type="horizontal">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="#" data-role="button" onclick="sendCommand('takeOff'); return false">Take Off</a>
-        <a href="#" data-role="button" onclick="sendCommand('land'); return false">Land</a>
+    <div data-role="collapsibleset" data-filter="true" data-inset="true" id="collapsiblesetForFilter" data-input="#searchForCollapsibleSet" style="width: 130px;">
+        <div data-role="collapsible">
+            <h3>Side Bar</h3>
+            <ul data-role="listview" data-inset="false">
+                <a href="#" data-role="button" onclick="sendCommand('takeOff'); return false">Take Off</a>
+                <a href="#" data-role="button" onclick="sendCommand('land'); return false">Land</a>
+                <a href="#" data-role="button" onclick="sendCommand('stop'); return false">Hover</a>
+            </ul>
+        </div>
     </div>
+    <img src="../static/images/video_view.jpg" style="float:left; width:660px;height:300px;">
 
     <div class="joystick_interface" style="display:flex; float:left;">
         <div data-jquery-element="joystick"></div>
-    </div>
-
-    <div class="menu">
-        <button class="menu" type="button" onclick="openNav()"><img src="../static/images/icons-png/bars-black.png"></button>
     </div>
 </div>
 

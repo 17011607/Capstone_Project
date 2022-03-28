@@ -1,4 +1,37 @@
 {% extends "layout.html" %}
 {% block content %}
+<style>
+    .setting-box{
+        position:relative;
+        text-align: center;
+    }   
+</style>
+<script>
+    var sendCommand=(command,params={})=>{
+        console.log({action:'sendCommand',command:command,params:params})   
+        params['command']=command
+        $.post("/api/command/",params).done((json)=>{
+            console.log({action:'sendCommand',json:json})
+        },'json')
+    }
 
+    $(document).on('pageinit',(event)=>{
+        $('#slider-2').on("slidestop",()=>{
+            let params={
+                speed: $("#slider-2").val(),
+            };
+            sendCommand('speed',params)
+        })
+    })
+</script>
+<div class="setting-box">
+    <h1>Settings</h1>
+</div>
+
+<form>
+    <div class="setting-box" style="text-align:left">
+        <h3>Drone Speed</h3>
+    </div>
+    <input type="range" name="slider-2" id="slider-2" data-highlight="true" min="0" max="20" value="10">
+</form>
 {% endblock %}

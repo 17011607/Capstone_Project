@@ -21,11 +21,11 @@ def command():
     cmd=request.form.get('command') # move commnad 시 coordX, coordY 매개변수도 같이 전달됨
     return jsonify(status='success'), 200
 
-'''
+
 @app.route('/setting/')
-def controller():
+def setting():
     return render_template('setting.html')
-'''
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port="9999", threaded=True)
