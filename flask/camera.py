@@ -7,8 +7,7 @@ class camera:
         self.PORT = PORT
         self.sock.bind(('0.0.0.0', 9998))
     def send(self, data):
-        self.sock.sendto(data.encode(), (self.HOST, self.PORT)); # Camera Commnad are only SS, LS, RS, LU, LD, RU, RD
-
+        self.sock.sendto(data.encode(), (self.HOST, self.PORT)); # The camera command consists of XY. X is one of S, L, R. X is one of S, U, D.
 '''
 cam = camera('192.168.137.47', 4210)
 value = input("value :")
