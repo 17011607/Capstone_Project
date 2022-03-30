@@ -62,10 +62,31 @@
     }
 
     var request=(command,coordX,coordY,params={})=>{
-        console.log({action:'sendCommand',command:command,params:params})   
-        params['command']=command
-        params['coordX'] = coordX;
-        params['coordY'] = coordY;
+        //console.log({action:'sendCommand',command:command,params:params})   
+        var arg = '';
+        if(coordX < 0){
+            arg += 'L';
+        }
+        else if(coordX > 0){
+            arg += 'R';
+        }
+        else{
+            arg += 'S';
+        }
+
+        if(coordY < 0){
+            arg += 'U';
+        }
+
+        else if(coordY > 0){
+            arg += 'D';
+        }
+
+        else{
+            arg += 'S';
+        }
+        params['command'] = command
+        params['direction'] = arg;
         $.post("/api/command/",params).done((json)=>{
             console.log({action:'sendCommand',json:json})
         },'json')
@@ -217,6 +238,7 @@
                     y / this.radius,
                     rx, ry
                 );
+                request("move",x, y);
             },
             move: function( x, y ) {
                 var a, d, rx, ry;
@@ -233,7 +255,6 @@
                     Math.sin( a ) * d,
                     rx, ry
                 );
-                request("move",this.coordX, this.coordY);
             },
             release: function() {
                 this.isHolding = false;
@@ -246,7 +267,6 @@
                     -this.btnCoordX,
                     -this.btnCoordY
                 );
-                this.cbRelease.call( this.jqElement[ 0 ] );
             }
         }
     });
