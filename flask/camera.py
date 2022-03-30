@@ -9,7 +9,8 @@ class camera:
     def send(self, data):
         self.sock.sendto(data.encode(), (self.HOST, self.PORT)); # Camera Commnad are only SS, LS, RS, LU, LD, RU, RD
 
-
+'''
 cam = camera('192.168.137.47', 4210)
 value = input("value :")
 cam.send(value)
+'''
