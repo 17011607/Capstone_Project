@@ -8,6 +8,29 @@
         <script src="../static/js/joystick.js"></script>
         <script src="../static/js/jquery-1.11.1.min.js"></script>
         <script src="../static/js/jquery.mobile-1.4.5.min.js"></script>
+        <script>
+            var sendCommand=(command,params={})=>{
+                console.log({action:'sendCommand',command:command,params:params})   
+                params['command']=command
+                $.post("/api/command/",params).done((json)=>{
+                    console.log({action:'sendCommand',json:json})
+                },'json')
+            }
+            $( function() {
+                $( ".joystick" ).element().init({
+                    move:    function( x, y, rx, ry ) {},
+                    hold:    function() {},
+                    release: function() {}
+                });
+            });
+            $( function() {
+                $( ".joystick2" ).element().init({
+                    move:    function( x, y, rx, ry ) {},
+                    hold:    function() {},
+                    release: function() {}
+                });
+            });
+        </script>
         <style>
             .controller-box{
                 position:static;
@@ -46,92 +69,12 @@
             }
         </style>
     </head>
-
     <body>
-        <script>
-            var sendCommand=(command,params={})=>{
-                console.log({action:'sendCommand',command:command,params:params})   
-                params['command']=command
-                $.post("/api/command/",params).done((json)=>{
-                    console.log({action:'sendCommand',json:json})
-                },'json')
-            }
-            $( function() {
-                $( ".joystick" ).element().init({
-                    move:    function( x, y, rx, ry ) {},
-                    hold:    function() {},
-                    release: function() {}
-                });
-            });
-            $( function() {
-                $( ".joystick2" ).element().init({
-                    move:    function( x, y, rx, ry ) {},
-                    hold:    function() {},
-                    release: function() {}
-                });
-            });
-        </script> 
-        <div class="controller-box">
-            <div data-role="collapsibleset" data-filter="true" data-inset="true" id="collapsiblesetForFilter" data-input="#searchForCollapsibleSet" style="width:100%;height:0px;margin:0;">
-                <div data-role="collapsible">
-                    <h3>Side Bar</h3>
-                    <ul data-role="listview" data-inset="false">
-                        <a href="/" data-role="button">Home</a>
-                        <a href="#" data-role="button" onclick="sendCommand('takeOff'); return false">Take Off</a>
-                        <a href="#" data-role="button" onclick="sendCommand('land'); return false">Land</a>
-                        <a href="#" data-role="button" onclick="sendCommand('stop'); return false">Hover</a>
-                    </ul>
-                </div>
-            </div>
-            <img src="../static/css/images/video_view.jpg" class="video_view">
-        </div>
-=======
-{% extends "layout2.html" %}
-{% block content %}
-<style>
-    .controller-box{
-        position:relative;
-        text-align:center;
-    }     
-    .joystick{
-        position:absolute;
-        left:5px;
-        top:190px;
-        z-index:1;
-    }
-    #side_bar{
-        position:absolute;
-        top:-10px;
-        left:-3px;
-        z-index:1;
-        width:100%;
-    }
-</style>
-<script src="../static/js/joystick_elements.js"></script>
-<script src="../static/js/joystick.js"></script>
-<script>
-    var sendCommand=(command,params={})=>{
-        console.log({action:'sendCommand',command:command,params:params})   
-        params['command']=command
-        $.post("/api/command/",params).done((json)=>{
-            console.log({action:'sendCommand',json:json})
-        },'json')
-    }
-
-    $( function() {
-        $( ".joystick" ).element().init({
-            move:    function( x, y, rx, ry ) {},
-            hold:    function() {},
-            release: function() {}
-        });
-    });
-</script>
-
-<div class="controller-box">
     <div data-role="collapsibleset" id='side_bar' data-filter="true" data-inset="true" id="collapsiblesetForFilter" data-input="#searchForCollapsibleSet">
         <div data-role="collapsible">
             <h3>Side Bar</h3>
             <ul data-role="listview" data-inset="false">
+                <a href="javascript:location.href='/'" data-role="button">Home</a>
                 <a href="#" data-role="button" onclick="sendCommand('takeOff'); return false">Take Off</a>
                 <a href="#" data-role="button" onclick="sendCommand('land'); return false">Land</a>
                 <a href="#" data-role="button" onclick="sendCommand('stop'); return false">Hover</a>
@@ -139,7 +82,6 @@
         </div>
     </div>
     <img src="../static/css/images/video_view.jpg" style="float:left; width:660px;height:300px;">
-
     <div class="joystick_interface">
         <div data-jquery-element="joystick"></div>
         <div data-jquery-element="joystick2"></div>
