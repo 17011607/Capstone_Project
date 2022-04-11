@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <html>
     <head>
         <title>Drone App</title>
@@ -85,6 +86,63 @@
             </div>
             <img src="../static/css/images/video_view.jpg" class="video_view">
         </div>
+=======
+{% extends "layout2.html" %}
+{% block content %}
+<style>
+    .controller-box{
+        position:relative;
+        text-align:center;
+    }     
+    .joystick{
+        position:absolute;
+        left:5px;
+        top:190px;
+        z-index:1;
+    }
+    #side_bar{
+        position:absolute;
+        top:-10px;
+        left:-3px;
+        z-index:1;
+        width:100%;
+    }
+</style>
+<script src="../static/js/joystick_elements.js"></script>
+<script src="../static/js/joystick.js"></script>
+<script>
+    var sendCommand=(command,params={})=>{
+        console.log({action:'sendCommand',command:command,params:params})   
+        params['command']=command
+        $.post("/api/command/",params).done((json)=>{
+            console.log({action:'sendCommand',json:json})
+        },'json')
+    }
+
+    $( function() {
+        $( ".joystick" ).element().init({
+            move:    function( x, y, rx, ry ) {},
+            hold:    function() {},
+            release: function() {}
+        });
+    });
+</script>
+
+<div class="controller-box">
+    <div data-role="collapsibleset" id='side_bar' data-filter="true" data-inset="true" id="collapsiblesetForFilter" data-input="#searchForCollapsibleSet">
+        <div data-role="collapsible">
+            <h3>Side Bar</h3>
+            <ul data-role="listview" data-inset="false">
+                <a href="#" data-role="button" onclick="sendCommand('takeOff'); return false">Take Off</a>
+                <a href="#" data-role="button" onclick="sendCommand('land'); return false">Land</a>
+                <a href="#" data-role="button" onclick="sendCommand('stop'); return false">Hover</a>
+            </ul>
+        </div>
+    </div>
+    <img src="../static/css/images/video_view.jpg" style="float:left; width:660px;height:300px;">
+
+    <div class="joystick_interface">
+>>>>>>> e5f235dd741e131b4609ca6d9d190b54610c2ba4
         <div data-jquery-element="joystick"></div>
         <div data-jquery-element="joystick2"></div>
     </body>
