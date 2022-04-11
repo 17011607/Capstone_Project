@@ -14,7 +14,7 @@
                 text-align: center;
                 margin:0;
                 padding:0;
-            }     
+            }
             .ui-content{
                 padding:0;
             }
@@ -38,6 +38,12 @@
                 bottom:30px;
                 z-index:1;
             }
+            .joystick2{
+                position:absolute;
+                right:5px;
+                bottom:30px;
+                z-index:1;
+            }
         </style>
     </head>
 
@@ -52,6 +58,13 @@
             }
             $( function() {
                 $( ".joystick" ).element().init({
+                    move:    function( x, y, rx, ry ) {},
+                    hold:    function() {},
+                    release: function() {}
+                });
+            });
+            $( function() {
+                $( ".joystick2" ).element().init({
                     move:    function( x, y, rx, ry ) {},
                     hold:    function() {},
                     release: function() {}
@@ -73,5 +86,6 @@
             <img src="../static/css/images/video_view.jpg" class="video_view">
         </div>
         <div data-jquery-element="joystick"></div>
+        <div data-jquery-element="joystick2"></div>
     </body>
 </html>
