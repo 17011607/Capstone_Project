@@ -30,6 +30,10 @@ def command():
 def setting():
     return render_template('setting.html')
 
+@app.route('/about/')
+def about():
+    return render_template('about.html')
+
 
 if __name__ == '__main__':
     cam = camera('192.168.137.47', 4210)
