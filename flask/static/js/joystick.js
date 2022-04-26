@@ -239,7 +239,7 @@
                     y / this.radius,
                     rx, ry
                 );
-                request("move",x, y);
+                request("cammove",x, y);
             },
             move: function( x, y ) {
                 var a, d, rx, ry;
@@ -413,7 +413,7 @@
                     y / this.radius,
                     rx, ry
                 );
-                request("Dronemove",x, y);
+                request("dronemove",x, y);
             },
             move: function( x, y ) {
                 var a, d, rx, ry;

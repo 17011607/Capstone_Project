@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="../static/css/jquery.mobile-1.4.5.min.css" />
         <script src="../static/js/jquery-1.11.1.min.js"></script>
         <script src="../static/js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="../static/js/file_upload.js"></script>
         <style>
             .setting-box{
                 position:relative;
@@ -47,6 +48,12 @@
                     </div>
                     <input type="range" name="slider-2" id="slider-2" data-highlight="true" min="0" max="20" value="10">
                 </form>
+            </div>
+            <div class="wrap">
+                <form action="http://localhost:9999/setting/get_credentials" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file">
+                    <input type = "submit" value = "제출">
+                </form>    
             </div>
         </div>
     </body>
