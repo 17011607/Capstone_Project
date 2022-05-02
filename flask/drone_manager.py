@@ -17,8 +17,8 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logger=logging.getLogger(__name__)
 
 DEFAULT_DISTANCE=0.30 # drone move 길이 => 30cm
-DEFAULT_SPEED=100 # drone speed
-DEFAULT_DEGREE=90 # drone degree
+DEFAULT_SPEED=10 # drone speed
+DEFAULT_DEGREE=10 # drone degree
 
 FRAME_X = int(960)
 FRAME_Y = int(720)
@@ -57,6 +57,8 @@ class DroneManager(metaclass=Singleton):
         self._receive_video_thread = threading.Thread(target=self.receive_video, args=(self.stop_event, self.proc_stdin, self.host_ip, self.video_port))
         self._receive_video_thread.start()
 
+        self._command_semaphore = threading.Semaphore(1)
+        self._command_thread = None
         
         self.send_command('command')
         self.send_command('streamon')
@@ -87,9 +89,36 @@ class DroneManager(metaclass=Singleton):
         import signal # Windows
         os.kill(self.proc.pid, signal.CTRL_C_EVENT)
         
-    def send_command(self,command):
-        logger.info({'action':'send_command','command':command}) # drone command log in terminal
-        self.socket.sendto(command.encode('utf-8'),self.drone_address) #drone에 command 전송
+    def send_command(self, command, blocking=True):  # send_command(f"go {drone x} {drone y} {drone z} {spped} blocking =False)
+        self._command_thread = threading.Thread(
+            target=self._send_command,
+            args=(command, blocking,))
+        self._command_thread.start()
+
+    def _send_command(self, command, blocking=True):
+        is_acquire = self._command_semaphore.acquire(blocking=blocking)
+        if is_acquire:
+            with contextlib.ExitStack() as stack:
+                stack.callback(self._command_semaphore.release)
+                logger.info({'action': 'send_command', 'command': command})
+                self.socket.sendto(command.encode('utf-8'), self.drone_address)
+
+                retry = 0
+                while self.response is None:
+                    time.sleep(0.3)
+                    if retry > 3:
+                        break
+                    retry += 1
+
+                if self.response is None:
+                    response = None
+                else:
+                    response = self.response.decode('utf-8')
+                self.response = None
+                return response
+
+        else:
+            logger.warning({'action': 'send_command', 'command': command, 'status': 'not_acquire'})
         
     def takeoff(self):
         self.send_command('takeoff')
@@ -157,9 +186,6 @@ class DroneManager(metaclass=Singleton):
     def hover(self):
         self.send_command('stop')
 
-    def battery(self):
-        self.send_command('battery?')
-
     def receive_video(self, stop_event, pipe_in, host_ip, video_port):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock_video:
             sock_video.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -207,3 +233,11 @@ class DroneManager(metaclass=Singleton):
         
 if __name__=='__main__':
     drone_manager = DroneManager()
+    drone_manager.takeoff()
+    drone_manager.streamon()
+    drone_manager.forward(20)
+    drone_manager.forward(20)
+    drone_manager.forward(20)
+    drone_manager.forward(20)
+    time.sleep(1)
+    drone_manager.land()
