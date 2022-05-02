@@ -59,7 +59,7 @@ def command():
             y += 20
         if direction.find('D') != -1 :
             y -= 20
-        drone.send_command(f"go {x} {y} 0 100")
+        drone.send_command(f"go {x} {y} 0 100 blocking=False")
 
     elif cmd == "takeoff":
         drone.takeoff()
