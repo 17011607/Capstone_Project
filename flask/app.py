@@ -52,13 +52,13 @@ def command():
         x = 0
         y = 0
         if direction.find('R') != -1 :
-            x -= 20
+            x -= 30
         if direction.find('L') != -1 :
-            x += 20
+            x += 30
         if direction.find('U') != -1 :
-            y += 20
+            y += 30
         if direction.find('D') != -1 :
-            y -= 20
+            y -= 30
         drone.send_command(f"go {x} {y} 0 100 blocking=False")
 
     elif cmd == "takeoff":
