@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logger=logging.getLogger(__name__)
 
 DEFAULT_DISTANCE=0.30 # drone move 길이 => 30cm
-DEFAULT_SPEED=10 # drone speed
+DEFAULT_SPEED=100 # drone speed
 DEFAULT_DEGREE=10 # drone degree
 
 FRAME_X = int(960)
@@ -156,7 +156,6 @@ class DroneManager(metaclass=Singleton):
             distance=int(round(distance*30.48)) # cm 기준으로 변환
         else:
             distance=int(round(distance))
-            #distance=int(round(distance))
         return self.send_command(f'{direction} {distance}')
     
     def up(self,distance=DEFAULT_DISTANCE):
@@ -230,6 +229,7 @@ class DroneManager(metaclass=Singleton):
             _, jpeg = cv.imencode('.jpg', frame)
             jpeg_binary = jpeg.tobytes()
             yield jpeg_binary
+
         
 if __name__=='__main__':
     drone_manager = DroneManager()
