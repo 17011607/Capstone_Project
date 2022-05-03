@@ -61,32 +61,54 @@
         }
     }
 
+    var sleep=(ms)=>{
+        const wakeUpTime=Date.now()+ms;
+        while(Date.now()<wakeUpTime){
+
+        }
+    }
+
     var request=(command,coordX,coordY,params={})=>{
-        //console.log({action:'sendCommand',command:command,params:params})  
+        //console.log({action:'sendCommand',command:command,params:params})   
+        console.log("coordX : " + coordX)
+        console.log("coordY : " + coordY)
         var arg = '';
-        if(coordX < 0){
+        if(coordX < 0 && coordY > -10 && coordY < 10){
             arg += 'L';
         }
-        else if(coordX > 0){
+        else if(coordX > 0 && coordY > -10 && coordY < 10){
             arg += 'R';
         }
-        else{
-            arg += 'S';
-        }
 
-        if(coordY < 0){
+        else if(coordY < 0 && coordX > -10 && coordX < 10){
             arg += 'U';
         }
-        else if(coordY > 0){
+
+        else if(coordY > 0 && coordX > -10 && coordX < 10){
             arg += 'D';
         }
-        else{
-            arg += 'S';
+
+        else if(coordX < -10 && coordY < -10){
+            arg += 'LU'
         }
+        else if(coordX > 10 && coordY < -10){
+            arg += 'RU'
+        }
+        else if(coordX < -10 && coordY > 10){
+            arg += 'LD'
+        }
+        else if(coordX > 10 && coordY > 10){
+            arg += 'RD'
+        }
+
+        else if(coordY == 0 && coordX == 0){
+            arg += 'S'
+        }
+        
         params['command'] = command
         params['direction'] = arg;
         $.post("/api/command/",params).done((json)=>{
-            //console.log({action:'sendCommand',json:json})
+            console.log({action:'sendCommand',json:json})
         },'json')
     }
     
@@ -104,11 +126,10 @@
                 position: relative;\
                 width: 100px;\
                 height: 100px;\
-                border: 10px solid;\
+                border: 1px solid;\
                 border-radius: 50%;\
-                background-color: black;\
                 transition: opacity 1s ease;\
-                opacity: 1;\
+                opacity: .3;\
                 cursor: move;\
             }\
             .joystick,\
@@ -118,9 +139,6 @@
             .joystick.joystick-show {\
                 transition-duration: .2s;\
                 opacity: 1;\
-            }\
-            .joystick div{\
-                background:red\
             }\
             .joystick:before,\
             .joystick * {\
@@ -282,19 +300,15 @@
                 position: relative;\
                 width: 100px;\
                 height: 100px;\
-                border: 10px solid;\
+                border: 1px solid;\
                 border-radius: 50%;\
-                background-color: black;\
                 transition: opacity 1s ease;\
-                opacity: 1;\
+                opacity: .3;\
                 cursor: move;\
             }\
             .joystick2,\
             .joystick2 * {\
                 box-sizing: border-box;\
-            }\
-            .joystick2 div{\
-                background:red\
             }\
             .joystick2.joystick-show {\
                 transition-duration: .2s;\
@@ -409,6 +423,8 @@
                 this.cbHold.call( this.jqElement[ 0 ] );
             },
             moveBtn: function( x, y, rx, ry ) {
+                var tempCoordX = 'S';
+                var tempCoordY = 'S';
                 this.jqBtn.css({
                     marginLeft: x,
                     marginTop: y,
@@ -419,7 +435,7 @@
                     y / this.radius,
                     rx, ry
                 );
-                
+                request("dronemove",x, y);
             },
             move: function( x, y ) {
                 var a, d, rx, ry;
@@ -436,7 +452,7 @@
                     Math.sin( a ) * d,
                     rx, ry
                 );
-                request("dronemove",x, y);
+                //request("dronemove",x, y);
             },
             release: function() {
                 this.isHolding = false;
