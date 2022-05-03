@@ -27,32 +27,32 @@ def move_control():
     drone = get_drone
     while 1:
         if status == 'R' :
-            #drone.right(20)
-            print("right")
+            drone.right(20)
+            #print("right")
         elif status == 'L' :
-            #drone.left(20)
-            print("left")
+            drone.left(20)
+            #print("left")
         elif status == 'U' :
-            #drone.forward(20)
-            print("forward")
+            drone.forward(20)
+            #print("forward")
         elif status == 'D':
-            #drone.back(20)
-            print("down")
+            drone.back(20)
+            #print("down")
         elif status == 'LU':
-            #drone.send_command(f"go 30 30 0 100")
-            print("Left up")
+            drone.send_command(f"go 30 30 0 100")
+            #print("Left up")
         elif status == 'RU' :
-            #drone.send_command(f"go -30 30 0 100")
-            print("Right up")
+            drone.send_command(f"go -30 30 0 100")
+            #print("Right up")
         elif status == 'LD':
-            #drone.send_command(f"go 30 -30 0 100")
-            print("left down")
+            drone.send_command(f"go 30 -30 0 100")
+            #print("left down")
         elif status == 'RD':
-            #drone.send_command(f"go -30 -30 0 100")
-            print("right down")
+            drone.send_command(f"go -30 -30 0 100")
+            #print("right down")
         else:
-            #drone.send_command(f"go 0 0 0 10")
-            print("stop")
+            drone.send_command(f"go 0 0 0 10")
+            #print("stop")
         time.sleep(1)
 
 @app.route('/')
