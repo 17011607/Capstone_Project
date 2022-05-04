@@ -24,40 +24,48 @@ def video_generator():
 
 def move_control():
     global status
-    drone = get_drone
+    drone = get_drone()
     while 1:
         if status == 'R' :
-            drone.right(20)
+            drone.right(40)
             #print("right")
         elif status == 'L' :
-            drone.left(20)
+            drone.left(40)
             #print("left")
         elif status == 'U' :
-            drone.forward(20)
+            drone.forward(40)
             #print("forward")
         elif status == 'D':
-            drone.back(20)
+            drone.back(40)
             #print("down")
         elif status == 'LU':
-            drone.send_command(f"go 30 30 0 100")
+            drone.send_command(f"go 30 30 0 100",blocking=False)
             #print("Left up")
         elif status == 'RU' :
-            drone.send_command(f"go -30 30 0 100")
+            drone.send_command(f"go -30 30 0 100",blocking=False)
             #print("Right up")
         elif status == 'LD':
-            drone.send_command(f"go 30 -30 0 100")
+            drone.send_command(f"go 30 -30 0 100",blocking=False)
             #print("left down")
         elif status == 'RD':
-            drone.send_command(f"go -30 -30 0 100")
+            drone.send_command(f"go -30 -30 0 100",blocking=False)
             #print("right down")
-        else:
-            drone.send_command(f"go 0 0 0 10")
+        #else:
+            drone.send_command(f"go 0 0 0 10",blocking=False)
             #print("stop")
-        time.sleep(1)
+        time.sleep(0.1)
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/battery')
+def drone_battery():
+    #drone=get_drone()
+    #battery=drone.battery()
+    battery=63
+    print(battery)
+    return jsonify({"battery":battery})
 
 @app.route('/controller/')
 def controller():
@@ -75,8 +83,7 @@ def command():
         direction = request.form.get('direction')
         print(f"direction : {direction}")
         status = direction
-        
-    
+
     elif cmd == "takeoff":
         drone.takeoff()
 
@@ -85,6 +92,10 @@ def command():
 
     elif cmd == "streamon":
         drone.streamon()
+    
+    elif cmd == "speed":
+        speed=request.form.get('speed')
+        drone.set_speed(speed)
 
     return jsonify(status='success'), 200
 
@@ -109,14 +120,13 @@ def ap():
     drone.send_command(f'ap {ssid} {password}')
     return render_template('setting.html')
 
+@app.route('/about/')
+def about():
+    return render_template('about.html')
 
 @app.route('/video/streaming')
 def video_feed():
     return Response(video_generator(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-
-
 
 if __name__ == '__main__':
     #cam = camera('192.168.137.47', 4210)

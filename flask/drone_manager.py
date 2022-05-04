@@ -59,11 +59,10 @@ class DroneManager(metaclass=Singleton):
 
         self._command_semaphore = threading.Semaphore(1)
         self._command_thread = None
-        
         self.send_command('command')
         self.send_command('streamon')
         self.set_speed(self.speed)
-
+     
     def receive_response(self, stop_event):
         while not stop_event.is_set():
             try:
@@ -79,7 +78,7 @@ class DroneManager(metaclass=Singleton):
     def stop(self):
         self.stop_event.set()
         retry = 0
-        while self.response_thread.isAlive():
+        while self._response_thread.isAlive():
                 time.sleep(0.3)
                 if retry > 30:
                     break
@@ -88,13 +87,13 @@ class DroneManager(metaclass=Singleton):
 
         import signal # Windows
         os.kill(self.proc.pid, signal.CTRL_C_EVENT)
-        
+          
     def send_command(self, command, blocking=True):  # send_command(f"go {drone x} {drone y} {drone z} {spped} blocking =False)
         self._command_thread = threading.Thread(
             target=self._send_command,
             args=(command, blocking,))
         self._command_thread.start()
-
+    
     def _send_command(self, command, blocking=True):
         is_acquire = self._command_semaphore.acquire(blocking=blocking)
         if is_acquire:
@@ -116,10 +115,16 @@ class DroneManager(metaclass=Singleton):
                     response = self.response.decode('utf-8')
                 self.response = None
                 return response
-
         else:
             logger.warning({'action': 'send_command', 'command': command, 'status': 'not_acquire'})
-        
+    '''        
+    def send_command(self,command):
+        logger.info({'action':'send_command','command':command}) # drone command log in terminal
+        self.socket.sendto(command.encode('utf-8'),self.drone_address) #drone에 command 전송
+    '''     
+    def battery(self):
+        return self.send_command('command');
+    
     def takeoff(self):
         self.send_command('takeoff')
         
@@ -156,7 +161,7 @@ class DroneManager(metaclass=Singleton):
             distance=int(round(distance*30.48)) # cm 기준으로 변환
         else:
             distance=int(round(distance))
-        return self.send_command(f'{direction} {distance}')
+        return self.send_command(f'{direction} {distance}',blocking=False)
     
     def up(self,distance=DEFAULT_DISTANCE):
         return self.move('up',distance)
@@ -229,7 +234,6 @@ class DroneManager(metaclass=Singleton):
             _, jpeg = cv.imencode('.jpg', frame)
             jpeg_binary = jpeg.tobytes()
             yield jpeg_binary
-
         
 if __name__=='__main__':
     drone_manager = DroneManager()

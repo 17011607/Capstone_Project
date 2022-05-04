@@ -9,10 +9,10 @@ if __name__ == "__main__":
 
     tello_ip = '192.168.10.1'
     tello_port = 8889 ## write port
-    tello_adderss = (tello_ip, tello_port)
+    tello_address = (tello_ip, tello_port)
 
-    socket.sendto('command'.encode('utf-8'), tello_adderss) ## Enter SDK Mode
-
+    socket.sendto('command'.encode('utf-8'), tello_address) ## Enter SDK Mode   
+    
     try:
         index = 0
         while True:
@@ -25,3 +25,4 @@ if __name__ == "__main__":
             sleep(0.2)
     except KeyboardInterrupt:
         pass
+    
