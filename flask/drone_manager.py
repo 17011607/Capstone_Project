@@ -60,7 +60,7 @@ class DroneManager(metaclass=Singleton):
         self._command_semaphore = threading.Semaphore(1)
         self._command_thread = None
         self.send_command('command')
-        self.send_command('streamon')
+        #self.send_command('streamon')
         self.set_speed(self.speed)
      
     def receive_response(self, stop_event):

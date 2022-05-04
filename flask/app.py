@@ -2,6 +2,7 @@ import os
 from flask import *
 from camera import camera
 from drone_manager import DroneManager
+import drone_state
 from werkzeug.utils import secure_filename
 from googleDrive import *
 import time
@@ -61,9 +62,7 @@ def index():
 
 @app.route('/battery')
 def drone_battery():
-    #drone=get_drone()
-    #battery=drone.battery()
-    battery=63
+    battery=drone_state.battery()
     print(battery)
     return jsonify({"battery":battery})
 
@@ -75,11 +74,19 @@ def controller():
 def command():
     drone = get_drone()
     cmd=request.form.get('command')
+    global status
     if cmd == "cammove":
         direction = request.form.get('direction')
+        if status == 'R' :
+            drone.right(90)
+        elif status == 'L' :
+            drone.left(90)
+        elif status == 'U' :
+            drone.up(30)
+        elif status == 'D':
+            drone.down(30)
         #cam.send(direction)
     elif cmd == "dronemove":
-        global status
         direction = request.form.get('direction')
         print(f"direction : {direction}")
         status = direction
