@@ -73,36 +73,56 @@
         console.log("coordX : " + coordX)
         console.log("coordY : " + coordY)
         var arg = '';
-        if(coordX < 0 && coordY > -10 && coordY < 10){
-            arg += 'L';
+        if(command='cammove'){
+            if(coordX < 0 && coordY > -10 && coordY < 10){
+                arg += 'L';
+            }
+            else if(coordX > 0 && coordY > -10 && coordY < 10){
+                arg += 'R';
+            }
+    
+            else if(coordY < 0 && coordX > -10 && coordX < 10){
+                arg += 'U';
+            }
+    
+            else if(coordY > 0 && coordX > -10 && coordX < 10){
+                arg += 'D';
+            }
+            else{
+                arg+='S';
+            }
         }
-        else if(coordX > 0 && coordY > -10 && coordY < 10){
-            arg += 'R';
-        }
-
-        else if(coordY < 0 && coordX > -10 && coordX < 10){
-            arg += 'U';
-        }
-
-        else if(coordY > 0 && coordX > -10 && coordX < 10){
-            arg += 'D';
-        }
-
-        else if(coordX < -10 && coordY < -10){
-            arg += 'LU'
-        }
-        else if(coordX > 10 && coordY < -10){
-            arg += 'RU'
-        }
-        else if(coordX < -10 && coordY > 10){
-            arg += 'LD'
-        }
-        else if(coordX > 10 && coordY > 10){
-            arg += 'RD'
-        }
-
-        else if(coordY == 0 && coordX == 0){
-            arg += 'S'
+        else{
+            if(coordX < 0 && coordY > -10 && coordY < 10){
+                arg += 'L';
+            }
+            else if(coordX > 0 && coordY > -10 && coordY < 10){
+                arg += 'R';
+            }
+    
+            else if(coordY < 0 && coordX > -10 && coordX < 10){
+                arg += 'U';
+            }
+    
+            else if(coordY > 0 && coordX > -10 && coordX < 10){
+                arg += 'D';
+            }
+    
+            else if(coordX < -10 && coordY < -10){
+                arg += 'LU'
+            }
+            else if(coordX > 10 && coordY < -10){
+                arg += 'RU'
+            }
+            else if(coordX < -10 && coordY > 10){
+                arg += 'LD'
+            }
+            else if(coordX > 10 && coordY > 10){
+                arg += 'RD'
+            }
+            else if(coordY == 0 && coordX == 0){
+                arg += 'S'
+            }
         }
         
         params['command'] = command
