@@ -61,68 +61,41 @@
         }
     }
 
-    var sleep=(ms)=>{
-        const wakeUpTime=Date.now()+ms;
-        while(Date.now()<wakeUpTime){
-
-        }
-    }
-
     var request=(command,coordX,coordY,params={})=>{
         //console.log({action:'sendCommand',command:command,params:params})   
         console.log("coordX : " + coordX)
         console.log("coordY : " + coordY)
         var arg = '';
-        if(command='cammove'){
-            if(coordX < 0 && coordY > -10 && coordY < 10){
-                arg += 'L';
-            }
-            else if(coordX > 0 && coordY > -10 && coordY < 10){
-                arg += 'R';
-            }
-    
-            else if(coordY < 0 && coordX > -10 && coordX < 10){
-                arg += 'U';
-            }
-    
-            else if(coordY > 0 && coordX > -10 && coordX < 10){
-                arg += 'D';
-            }
-            else{
-                arg+='S';
-            }
+        if(coordX < 0 && coordY > -10 && coordY < 10){
+            arg += 'L';
         }
-        else{
-            if(coordX < 0 && coordY > -10 && coordY < 10){
-                arg += 'L';
-            }
-            else if(coordX > 0 && coordY > -10 && coordY < 10){
-                arg += 'R';
-            }
-    
-            else if(coordY < 0 && coordX > -10 && coordX < 10){
-                arg += 'U';
-            }
-    
-            else if(coordY > 0 && coordX > -10 && coordX < 10){
-                arg += 'D';
-            }
-    
-            else if(coordX < -10 && coordY < -10){
-                arg += 'LU'
-            }
-            else if(coordX > 10 && coordY < -10){
-                arg += 'RU'
-            }
-            else if(coordX < -10 && coordY > 10){
-                arg += 'LD'
-            }
-            else if(coordX > 10 && coordY > 10){
-                arg += 'RD'
-            }
-            else if(coordY == 0 && coordX == 0){
-                arg += 'S'
-            }
+        else if(coordX > 0 && coordY > -10 && coordY < 10){
+            arg += 'R';
+        }
+
+        else if(coordY < 0 && coordX > -10 && coordX < 10){
+            arg += 'U';
+        }
+
+        else if(coordY > 0 && coordX > -10 && coordX < 10){
+            arg += 'D';
+        }
+
+        else if(coordX < -10 && coordY < -10){
+            arg += 'LU'
+        }
+        else if(coordX > 10 && coordY < -10){
+            arg += 'RU'
+        }
+        else if(coordX < -10 && coordY > 10){
+            arg += 'LD'
+        }
+        else if(coordX > 10 && coordY > 10){
+            arg += 'RD'
+        }
+
+        else if(coordY == 0 && coordX == 0){
+            arg += 'S'
         }
         
         params['command'] = command
@@ -131,7 +104,51 @@
             console.log({action:'sendCommand',json:json})
         },'json')
     }
-    
+
+    var cam_request=(command,coordX,coordY,params={})=>{
+        //console.log({action:'sendCommand',command:command,params:params})   
+        console.log("coordX : " + coordX)
+        console.log("coordY : " + coordY)
+        var arg = '';
+        if(coordX < 0 && coordY > -10 && coordY < 10){
+            arg += 'W';
+        }
+        else if(coordX > 0 && coordY > -10 && coordY < 10){
+            arg += 'E';
+        }
+
+        else if(coordY < 0 && coordX > -10 && coordX < 10){
+            arg += 'N';
+        }
+
+        else if(coordY > 0 && coordX > -10 && coordX < 10){
+            arg += 'S';
+        }
+
+        else if(coordX < -10 && coordY < -10){
+            arg += 'NW'
+        }
+        else if(coordX > 10 && coordY < -10){
+            arg += 'NE'
+        }
+        else if(coordX < -10 && coordY > 10){
+            arg += 'SW'
+        }
+        else if(coordX > 10 && coordY > 10){
+            arg += 'SE'
+        }
+
+        else if(coordY == 0 && coordX == 0){
+            arg += 'C'
+        }
+        
+        params['command'] = command
+        params['direction'] = arg;
+        $.post("/api/command/",params).done((json)=>{
+            console.log({action:'sendCommand',json:json})
+        },'json')
+    }
+
     jqWindow
         .on( onDesktop ? "mousemove" : "touchmove", winMove )
         .on( onDesktop ? "mouseup" : "touchend", winRelease )
@@ -279,7 +296,7 @@
                     y / this.radius,
                     rx, ry
                 );
-                request("cammove",x, y);
+                cam_request("cammove",x, y);
             },
             move: function( x, y ) {
                 var a, d, rx, ry;
@@ -443,8 +460,6 @@
                 this.cbHold.call( this.jqElement[ 0 ] );
             },
             moveBtn: function( x, y, rx, ry ) {
-                var tempCoordX = 'S';
-                var tempCoordY = 'S';
                 this.jqBtn.css({
                     marginLeft: x,
                     marginTop: y,
