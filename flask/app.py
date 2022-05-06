@@ -6,7 +6,6 @@ from werkzeug.utils import secure_filename
 from googleDrive import *
 import time
 import threading
-import drone_state 
 
 PROJECT_ROOT=os.path.dirname(os.path.abspath(__file__))
 TEMPLATES=os.path.join(PROJECT_ROOT,'templates')
@@ -67,7 +66,9 @@ def index():
 
 @app.route('/battery')
 def drone_battery():
-    battery=drone_state.battery()
+    drone = get_drone()
+    battery = drone.battery()
+    #battery=drone_state.battery()
     print(battery)
     return jsonify({"battery":battery})
 

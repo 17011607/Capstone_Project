@@ -12,6 +12,7 @@ import numpy as np
 from unittest.mock import DEFAULT
 from xml.dom.expatbuilder import theDOMImplementation
 from base import Singleton
+import drone_state
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logger=logging.getLogger(__name__)
@@ -29,7 +30,7 @@ FRAME_CENTER_Y = FRAME_Y / 2
 CMD_FFMPEG = f'ffmpeg -hwaccel auto -hwaccel_device opencl -i pipe:0 -pix_fmt bgr24 -s {FRAME_X}x{FRAME_Y} -f rawvideo pipe:1'
 
 class DroneManager(metaclass=Singleton):
-    def __init__(self, host_ip='192.168.10.2', host_port=8889, 
+    def __init__(self, host_ip='192.168.10.4', host_port=8889, 
                  drone_ip='192.168.10.1',drone_port=8889,
                  is_imperial=False,speed=DEFAULT_SPEED): # is_imperial은 대충 영국의 길이 기준? 이런거 말하는 건데 false로 설정!
         self.host_ip=host_ip
@@ -60,7 +61,7 @@ class DroneManager(metaclass=Singleton):
         self._command_semaphore = threading.Semaphore(1)
         self._command_thread = None
         self.send_command('command')
-        #self.send_command('streamon')
+        self.send_command('streamon')
         self.set_speed(self.speed)
      
     def receive_response(self, stop_event):
@@ -103,12 +104,13 @@ class DroneManager(metaclass=Singleton):
                 self.socket.sendto(command.encode('utf-8'), self.drone_address)
 
                 retry = 0
+                
                 while self.response is None:
-                    time.sleep(0.3)
+                    time.sleep(0.01)
                     if retry > 3:
                         break
                     retry += 1
-
+                
                 if self.response is None:
                     response = None
                 else:
@@ -123,7 +125,8 @@ class DroneManager(metaclass=Singleton):
         self.socket.sendto(command.encode('utf-8'),self.drone_address) #drone에 command 전송
     '''     
     def battery(self):
-        return self.send_command('command');
+        status = drone_state.drone_status()
+        return status.battery()
     
     def takeoff(self):
         self.send_command('takeoff')
