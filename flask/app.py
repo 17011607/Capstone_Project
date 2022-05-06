@@ -2,11 +2,11 @@ import os
 from flask import *
 from camera import camera
 from drone_manager import DroneManager
-import drone_state
 from werkzeug.utils import secure_filename
 from googleDrive import *
 import time
 import threading
+import drone_state 
 
 PROJECT_ROOT=os.path.dirname(os.path.abspath(__file__))
 TEMPLATES=os.path.join(PROJECT_ROOT,'templates')
@@ -25,36 +25,41 @@ def video_generator():
 
 def move_control():
     global status
+    global height
     drone = get_drone()
     while 1:
         if status == 'R' :
-            drone.right(40)
+            #drone.right(40)
+            drone.send_command(f'go 0 -30 {height} 100', blocking=False)
             #print("right")
         elif status == 'L' :
-            drone.left(40)
+            #drone.left(40)
+            drone.send_command(f'go 0 30 {height} 100', blocking=False)
             #print("left")
         elif status == 'U' :
-            drone.forward(40)
+            #drone.forward(40)
+            drone.send_command(f'go 30 0 {height} 100', blocking=False)
             #print("forward")
         elif status == 'D':
-            drone.back(40)
+            #drone.back(40)
+            drone.send_command(f'go -30 0 {height} 100', blocking=False)
             #print("down")
         elif status == 'LU':
-            drone.send_command(f"go 30 30 0 100",blocking=False)
+            drone.send_command(f"go 30 30 {height} 100",blocking=False)
             #print("Left up")
         elif status == 'RU' :
-            drone.send_command(f"go -30 30 0 100",blocking=False)
+            drone.send_command(f"go 30 -30 {height} 100",blocking=False)
             #print("Right up")
         elif status == 'LD':
-            drone.send_command(f"go 30 -30 0 100",blocking=False)
+            drone.send_command(f"go -30 30 {height} 100",blocking=False)
             #print("left down")
         elif status == 'RD':
-            drone.send_command(f"go -30 -30 0 100",blocking=False)
+            drone.send_command(f"go -30 -30 {height} 100",blocking=False)
             #print("right down")
         #else:
-            drone.send_command(f"go 0 0 0 10",blocking=False)
+            drone.send_command(f"go 0 0 {height} 10",blocking=False)
             #print("stop")
-        time.sleep(0.1)
+        time.sleep(0.01)
 
 @app.route('/')
 def index():
@@ -74,21 +79,38 @@ def controller():
 def command():
     drone = get_drone()
     cmd=request.form.get('command')
-    global status
+    print(f"command : {cmd}")
     if cmd == "cammove":
+        global height
         direction = request.form.get('direction')
-        if status == 'R' :
-            drone.right(90)
-        elif status == 'L' :
-            drone.left(90)
-        elif status == 'U' :
-            drone.up(30)
-        elif status == 'D':
-            drone.down(30)
-        #cam.send(direction)
+        if direction == 'C':
+            height = 0
+        elif direction == 'N':
+            height = 10
+        elif direction == 'S':
+            height = -10
+        elif direction == 'W':
+            print(f'direction : W')
+            # cw 
+        elif direction == 'E':
+            print(f'direction : E')
+            # ccw
+        elif direction == 'NW':
+            height = 10 
+            # cw
+        elif direction == 'NE':
+            height = 10 
+            # ccw
+        elif direction == 'SW':
+            height = -10
+            # cw
+        elif direction == 'SE':
+            height = -10
+            # ccw
+        
     elif cmd == "dronemove":
+        global status
         direction = request.form.get('direction')
-        print(f"direction : {direction}")
         status = direction
 
     elif cmd == "takeoff":
@@ -119,7 +141,7 @@ def get_credentials():
     make_token()
     return render_template('setting.html')
 
-@app.route('/setting/ap')
+@app.route('/setting/ap', methods=['POST'])
 def ap():
     drone = get_drone()
     ssid = request.form.get('SSID')
@@ -137,7 +159,6 @@ def video_feed():
 
 if __name__ == '__main__':
     #cam = camera('192.168.137.47', 4210)
-    #temp_direction = "SS"
     status = "S"
     _move = threading.Thread(target=move_control)
     _move.start()
