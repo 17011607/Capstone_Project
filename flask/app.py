@@ -66,7 +66,8 @@ def index():
 
 @app.route('/battery')
 def drone_battery():
-    battery=drone_state.battery()
+    drone=get_drone()
+    battery=drone.battery()
     return jsonify({"battery":battery})
 
 @app.route('/controller/')
