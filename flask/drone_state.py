@@ -27,7 +27,7 @@ class drone_status():
         return data
 
     def battery(self):
-        socket.sendto('battery?'.encode('utf-8'), self.tello_address) ## Enter SDK Mode   
+        socket.sendto('command'.encode('utf-8'), self.tello_address) ## Enter SDK Mode   
         response, ip = socket.recvfrom(1024)
         data=response.decode()
         print(data)
