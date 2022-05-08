@@ -6,6 +6,32 @@
         <script src="../static/js/jquery-1.11.1.min.js"></script>
         <script src="../static/js/jquery.mobile-1.4.5.min.js"></script>
         <script>
+            function showLoadingBar() {
+                var maskHeight = $(document).height();
+                var maskWidth = window.document.body.clientWidth;
+
+                var mask = "<div id='mask' style='position:absolute; z-index:9000; background-color:#000000; display:none; left:0; top:0;'></div>";
+                var loadingImg = '';
+
+                loadingImg += "<div id='loadingImg' style='position:absolute; left:45%; top:40%; display:none; z-index:10000;'>";
+                loadingImg += "    <img src='../static/img/loading.gif'/>";
+                loadingImg += "</div>";
+
+                $('body').append(mask).append(loadingImg);
+
+                $('#mask').css({
+                    'width' : maskWidth
+                    , 'height': maskHeight
+                    , 'opacity' : '0.3'
+                });
+
+                $('#mask').show();
+                $('#loadingImg').show();
+            }
+            function hideLoadingBar() {
+                $('#mask, #loadingImg').hide();
+                $('#mask, #loadingImg').remove();
+            }
             var color=["limegreen","coral","red"];
             var getLEDcolor=(progress)=>{
                 var LED=null;
@@ -21,6 +47,7 @@
                 return LED;
             }
             $(()=>{
+                showLoadingBar();
                 $.ajax({
                     url:"/battery",
                     async:false
@@ -47,6 +74,7 @@
                     $(".Label").css("color","red").text(`${percent}%`);
                     $(".Energy").slice((percent/10)+1,10).addClass("on").css("background-color","gray");
                 }
+                hideLoadingBar()
             })
         </script>
         <style>
