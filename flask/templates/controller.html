@@ -30,6 +30,13 @@
                     release: function() {}
                 });
             });
+
+            var save = document.createElement('a');
+            save.href = $('#drone_image').attr('src');
+            save.target = '_blank';
+            save.download = 'photo.jpg'
+
+            var event = document.createEvent('Event');
         </script>
         <style>
             .controller-box{
@@ -60,6 +67,12 @@
                 bottom:30px;
                 z-index:1;
             }
+            .click_button{
+                position:absolute;
+                left:100px;
+                bottom:30px;
+                z-index:1;
+            }
         </style>
     </head>
     <body>
@@ -75,11 +88,10 @@
             </ul>
         </div>
     </div>
-    <div style="float:left; width:100%; height:350px;">
-        <img src="/video/streaming" style="float:left; width:100%; height:100%; object-fit: cover;">
-    </div>    
+    <img id="drone_image" src="/video/streaming" style="float:left; width:100%; height:100%; object-fit: cover;">
     <div class="joystick_interface">
         <div data-jquery-element="joystick"></div>
+        <div class = "click_button"><a href = "/video/snapshot"><button name="Click"></button></a></div> 
         <div data-jquery-element="joystick2"></div>
     </body>
 </html>
