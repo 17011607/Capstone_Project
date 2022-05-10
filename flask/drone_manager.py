@@ -28,10 +28,11 @@ FRAME_SIZE = FRAME_AREA * 3
 FRAME_CENTER_X = FRAME_X / 2
 FRAME_CENTER_Y = FRAME_Y / 2
 CMD_FFMPEG = f'ffmpeg -hwaccel auto -hwaccel_device opencl -i pipe:0 -pix_fmt bgr24 -s {FRAME_X}x{FRAME_Y} -f rawvideo pipe:1'
+SNAPSHOT_IMAGE_FOLDER = './static/img/snapshots/'
 
 class DroneManager(metaclass=Singleton):
-    def __init__(self, host_ip='192.168.10.4', host_port=8889, 
-                 drone_ip='192.168.10.1',drone_port=8889,
+    def __init__(self, host_ip='192.168.137.196', host_port=8889, 
+                 drone_ip='192.168.137.198',drone_port=8889,
                  is_imperial=False,speed=DEFAULT_SPEED): # is_imperial은 대충 영국의 길이 기준? 이런거 말하는 건데 false로 설정!
         self.host_ip=host_ip
         self.host_port=host_port
@@ -63,6 +64,12 @@ class DroneManager(metaclass=Singleton):
         self.send_command('command')
         self.send_command('streamon')
         self.set_speed(self.speed)
+
+        if not os.path.exists(SNAPSHOT_IMAGE_FOLDER):
+            print(f'{SNAPSHOT_IMAGE_FOLDER} does not exists')
+            os.mkdir(SNAPSHOT_IMAGE_FOLDER)
+
+        self.is_snapshot = False
      
     def receive_response(self, stop_event):
         while not stop_event.is_set():
@@ -125,8 +132,12 @@ class DroneManager(metaclass=Singleton):
         self.socket.sendto(command.encode('utf-8'),self.drone_address) #drone에 command 전송
     '''     
     def battery(self):
-        status = drone_state.drone_status()
-        return status.battery()
+        status = drone_state.drone_status(self.drone_ip, self.host_ip)
+        return status.print_state("bat")
+
+    def tof(self):
+        status = drone_state.drone_status(self.drone_ip, self.host_ip)
+        return status.print_state("tof")
     
     def takeoff(self):
         self.send_command('takeoff')
@@ -193,6 +204,17 @@ class DroneManager(metaclass=Singleton):
     def hover(self):
         self.send_command('stop')
 
+    def snapshot(self):
+        self.is_snapshot = True
+        retry = 0
+        while retry < 3:
+            if not self.is_snapshot:
+                return True
+            time.sleep(0.2)
+            retry += 1
+        return False
+
+
     def receive_video(self, stop_event, pipe_in, host_ip, video_port):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock_video:
             sock_video.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -236,6 +258,17 @@ class DroneManager(metaclass=Singleton):
         for frame in self.video_binary_generator():
             _, jpeg = cv.imencode('.jpg', frame)
             jpeg_binary = jpeg.tobytes()
+
+            if self.is_snapshot:
+                backup_file = time.strftime("%Y%m%d-%H%M%S") + '.jpg'
+                snapshot_file = 'snapshot.jpg'
+                for filename in (backup_file, snapshot_file):
+                    file_path = os.path.join(
+                        SNAPSHOT_IMAGE_FOLDER, filename)
+                    with open(file_path, 'wb') as f:
+                        f.write(jpeg_binary)
+                self.is_snapshot = False
+
             yield jpeg_binary
         
 if __name__=='__main__':

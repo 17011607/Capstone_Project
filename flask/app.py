@@ -66,8 +66,10 @@ def index():
 
 @app.route('/battery')
 def drone_battery():
-    drone=get_drone()
-    battery=drone.battery()
+    drone = get_drone()
+    battery = drone.battery()
+    #battery=drone_state.battery()
+    print(battery)
     return jsonify({"battery":battery})
 
 @app.route('/controller/')
@@ -155,6 +157,12 @@ def about():
 @app.route('/video/streaming')
 def video_feed():
     return Response(video_generator(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video/snapshot')
+def snap_shot():
+    drone = get_drone()
+    drone.snapshot()
+    
 
 if __name__ == '__main__':
     #cam = camera('192.168.137.47', 4210)
