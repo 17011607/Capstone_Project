@@ -15,6 +15,11 @@ app = Flask(__name__,
             template_folder=TEMPLATES,
             static_folder=STATIC_FOLDER)
 
+DISTANCE = 50
+HEIGHT = 10
+DEGREE = 10
+
+
 def get_drone():
     return DroneManager()
 
@@ -24,15 +29,24 @@ def video_generator():
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + jpeg + b'\r\n\r\n')
 
 def move_control():
-    global status
     global a
     global b
     global height
     global degree
+    temp_a = 0
+    temp_b = 0
+    temp_height = 0
+    temp_degree = 0
     drone = get_drone()
     while 1:
-        drone.send_command(f'rc {a} {b} {height} {degree}', blocking=False)
-        time.sleep(0.01)
+        if a != temp_a or b != temp_b or height != temp_height or degree != temp_degree:
+            drone.send_command(f'stop')
+        else:
+            drone.send_command(f'rc {a} {b} {height} {degree}', blocking=False)
+        temp_a = a
+        temp_b = b
+        temp_height = height
+        temp_degree = degree
 
 @app.route('/')
 def index():
@@ -58,28 +72,28 @@ def command():
         global height
         global degree
         direction = request.form.get('direction')
-        if direction == 'C':
-            height = 0
-        elif direction == 'N':
-            height = 10
+        height = 0
+        degree = 0
+        if direction == 'N':
+            height = HEIGHT
         elif direction == 'S':
-            height = -10
+            height = -HEIGHT
         elif direction == 'W':
-            degree = 10
+            degree = DEGREE
         elif direction == 'E':
-            degree = -10
+            degree = -DEGREE
         elif direction == 'NW':
-            height = 10 
-            degree = 10
+            height = HEIGHT 
+            degree = DEGREE
         elif direction == 'NE':
-            height = 10 
-            degree = -10
+            height = HEIGHT 
+            degree = -DEGREE
         elif direction == 'SW':
-            height = -10
-            degree = 10
+            height = -HEIGHT
+            degree = DEGREE
         elif direction == 'SE':
-            height = -10
-            degree = -10
+            height = -HEIGHT
+            degree = -DEGREE
         else:
             height = 0
             degree = 0
@@ -89,26 +103,28 @@ def command():
         global b
         direction = request.form.get('direction')
         status = direction
+        a = 0
+        b = 0
         if status == 'R' :
-            a += 10
+            a = DISTANCE
         elif status == 'L' :
-            a -= 10
+            a = -DISTANCE
         elif status == 'U' :
-            b -= 10
+            b = -DISTANCE
         elif status == 'D':
-            b += 10
+            b = DISTANCE
         elif status == 'LU':
-            a -= 10
-            b -= 10
+            a = -DISTANCE
+            b = -DISTANCE
         elif status == 'RU' :
-            a += 10
-            b -= 10
+            a = DISTANCE
+            b = -DISTANCE
         elif status == 'LD':
-            a -= 10
-            b += 10
+            a = -DISTANCE
+            b = DISTANCE
         elif status == 'RD':
-            a += 10
-            b += 10
+            a = DISTANCE
+            b = DISTANCE
         else:
             a = 0
             b = 0
@@ -165,7 +181,10 @@ def snap_shot():
 
 if __name__ == '__main__':
     #cam = camera('192.168.137.47', 4210)
-    status = "S"
+    a = 0
+    b = 0
+    height = 0
+    degree = 0
     _move = threading.Thread(target=move_control)
     _move.start()
     app.run(host='0.0.0.0',port="9999", threaded=True)
