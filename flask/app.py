@@ -1,4 +1,5 @@
 import os
+from re import A, X
 from flask import *
 from camera import camera
 from drone_manager import DroneManager
@@ -24,40 +25,13 @@ def video_generator():
 
 def move_control():
     global status
+    global a
+    global b
     global height
+    global degree
     drone = get_drone()
     while 1:
-        if status == 'R' :
-            #drone.right(40)
-            drone.send_command(f'go 0 -30 {height} 100', blocking=False)
-            #print("right")
-        elif status == 'L' :
-            #drone.left(40)
-            drone.send_command(f'go 0 30 {height} 100', blocking=False)
-            #print("left")
-        elif status == 'U' :
-            #drone.forward(40)
-            drone.send_command(f'go 30 0 {height} 100', blocking=False)
-            #print("forward")
-        elif status == 'D':
-            #drone.back(40)
-            drone.send_command(f'go -30 0 {height} 100', blocking=False)
-            #print("down")
-        elif status == 'LU':
-            drone.send_command(f"go 30 30 {height} 100",blocking=False)
-            #print("Left up")
-        elif status == 'RU' :
-            drone.send_command(f"go 30 -30 {height} 100",blocking=False)
-            #print("Right up")
-        elif status == 'LD':
-            drone.send_command(f"go -30 30 {height} 100",blocking=False)
-            #print("left down")
-        elif status == 'RD':
-            drone.send_command(f"go -30 -30 {height} 100",blocking=False)
-            #print("right down")
-        #else:
-            drone.send_command(f"go 0 0 {height} 10",blocking=False)
-            #print("stop")
+        drone.send_command(f'rc {a} {b} {height} {degree}', blocking=False)
         time.sleep(0.01)
 
 @app.route('/')
@@ -68,8 +42,7 @@ def index():
 def drone_battery():
     drone = get_drone()
     battery = drone.battery()
-    #battery=drone_state.battery()
-    print(battery)
+    #print(battery)
     return jsonify({"battery":battery})
 
 @app.route('/controller/')
@@ -83,6 +56,7 @@ def command():
     print(f"command : {cmd}")
     if cmd == "cammove":
         global height
+        global degree
         direction = request.form.get('direction')
         if direction == 'C':
             height = 0
@@ -91,28 +65,53 @@ def command():
         elif direction == 'S':
             height = -10
         elif direction == 'W':
-            print(f'direction : W')
-            # cw 
+            degree = 10
         elif direction == 'E':
-            print(f'direction : E')
-            # ccw
+            degree = -10
         elif direction == 'NW':
             height = 10 
-            # cw
+            degree = 10
         elif direction == 'NE':
             height = 10 
-            # ccw
+            degree = -10
         elif direction == 'SW':
             height = -10
-            # cw
+            degree = 10
         elif direction == 'SE':
             height = -10
-            # ccw
+            degree = -10
+        else:
+            height = 0
+            degree = 0
         
     elif cmd == "dronemove":
-        global status
+        global a
+        global b
         direction = request.form.get('direction')
         status = direction
+        if status == 'R' :
+            a += 10
+        elif status == 'L' :
+            a -= 10
+        elif status == 'U' :
+            b -= 10
+        elif status == 'D':
+            b += 10
+        elif status == 'LU':
+            a -= 10
+            b -= 10
+        elif status == 'RU' :
+            a += 10
+            b -= 10
+        elif status == 'LD':
+            a -= 10
+            b += 10
+        elif status == 'RD':
+            a += 10
+            b += 10
+        else:
+            a = 0
+            b = 0
 
     elif cmd == "takeoff":
         drone.takeoff()
