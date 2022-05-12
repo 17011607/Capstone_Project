@@ -15,7 +15,7 @@ app = Flask(__name__,
             template_folder=TEMPLATES,
             static_folder=STATIC_FOLDER)
 
-DISTANCE = 50
+DISTANCE = 10
 HEIGHT = 10
 DEGREE = 10
 
@@ -41,12 +41,17 @@ def move_control():
     while 1:
         if a != temp_a or b != temp_b or height != temp_height or degree != temp_degree:
             drone.send_command(f'stop')
+            print("Drone Stop!")
+        elif a == 0 and b == 0 and height  == 0 and degree == 0:
+            #print(f"continue!")
+            continue
         else:
             drone.send_command(f'rc {a} {b} {height} {degree}', blocking=False)
         temp_a = a
         temp_b = b
         temp_height = height
         temp_degree = degree
+        time.sleep(0.01)
 
 @app.route('/')
 def index():
@@ -56,7 +61,6 @@ def index():
 def drone_battery():
     drone = get_drone()
     battery = drone.battery()
-    #print(battery)
     return jsonify({"battery":battery})
 
 @app.route('/controller/')
@@ -76,58 +80,75 @@ def command():
         degree = 0
         if direction == 'N':
             height = HEIGHT
+            # print(f"joystic1 : N = {direction}, {height}, {degree}")
         elif direction == 'S':
             height = -HEIGHT
+            # print(f"joystic1 : S = {direction}, {height}, {degree}")
         elif direction == 'W':
             degree = DEGREE
+            # print(f"joystic1 : W = {direction}, {height}, {degree}")
         elif direction == 'E':
             degree = -DEGREE
+            # print(f"joystic1 : E = {direction}, {height}, {degree}")
         elif direction == 'NW':
-            height = HEIGHT 
+            height = HEIGHT
             degree = DEGREE
+            # print(f"joystic1 : NW = {direction}, {height}, {degree}")
         elif direction == 'NE':
-            height = HEIGHT 
+            height = HEIGHT
             degree = -DEGREE
+            # print(f"joystic1 : NE = {direction}, {height}, {degree}")
         elif direction == 'SW':
             height = -HEIGHT
             degree = DEGREE
+            # print(f"joystic1 : SW = {direction}, {height}, {degree}")
         elif direction == 'SE':
             height = -HEIGHT
             degree = -DEGREE
+            # print(f"joystic1 : SE = {direction}, {height}, {degree}")
         else:
             height = 0
             degree = 0
+            # print(f"joystic1 : C = {direction}, {height}, {degree}")
         
     elif cmd == "dronemove":
         global a
         global b
         direction = request.form.get('direction')
-        status = direction
         a = 0
         b = 0
-        if status == 'R' :
+        if direction == 'R' :
             a = DISTANCE
-        elif status == 'L' :
+            # print(f"joystic2 : R = {direction}, {a}, {b}")
+        elif direction == 'L' :
             a = -DISTANCE
-        elif status == 'U' :
-            b = -DISTANCE
-        elif status == 'D':
+            # print(f"joystic2 : L = {direction}, {a}, {b}")
+        elif direction == 'U' :
             b = DISTANCE
-        elif status == 'LU':
+            # print(f"joystic2 : U = {direction}, {a}, {b}")
+        elif direction == 'D':
+            b = -DISTANCE
+            # print(f"joystic2 : D = {direction}, {a}, {b}")
+        elif direction == 'RU':
             a = -DISTANCE
             b = -DISTANCE
-        elif status == 'RU' :
+            # print(f"joystic2 : RU = {direction}, {a}, {b}")
+        elif direction == 'LU' :
             a = DISTANCE
             b = -DISTANCE
-        elif status == 'LD':
+            # print(f"joystic2 : LU = {direction}, {a}, {b}")
+        elif direction == 'RD':
             a = -DISTANCE
             b = DISTANCE
-        elif status == 'RD':
+            # print(f"joystic2 : RD = {direction}, {a}, {b}")
+        elif direction == 'LD':
             a = DISTANCE
             b = DISTANCE
+            # print(f"joystic2 : LD = {direction}, {a}, {b}")
         else:
             a = 0
             b = 0
+            # print(f"joystic2 : S = {direction}, {a}, {b}")
 
     elif cmd == "takeoff":
         drone.takeoff()
