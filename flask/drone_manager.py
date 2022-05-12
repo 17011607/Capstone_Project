@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logger=logging.getLogger(__name__)
 
 DEFAULT_DISTANCE=0.30 # drone move 길이 => 30cm
-DEFAULT_SPEED=100 # drone speed
+DEFAULT_SPEED=20 # drone speed
 DEFAULT_DEGREE=10 # drone degree
 
 FRAME_X = int(960)
@@ -32,7 +32,7 @@ SNAPSHOT_IMAGE_FOLDER = './static/img/snapshots/'
 
 class DroneManager(metaclass=Singleton):
     def __init__(self, host_ip='192.168.137.196', host_port=8889, 
-                 drone_ip='192.168.137.198',drone_port=8889,
+                 drone_ip='192.168.137.143',drone_port=8889,
                  is_imperial=False,speed=DEFAULT_SPEED): # is_imperial은 대충 영국의 길이 기준? 이런거 말하는 건데 false로 설정!
         self.host_ip=host_ip
         self.host_port=host_port
@@ -43,7 +43,6 @@ class DroneManager(metaclass=Singleton):
         self.speed=speed
         self.socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.socket.bind((self.host_ip,self.host_port))
-        
         self.response = None
         self.stop_event = threading.Event()
         self._response_thread = threading.Thread(target=self.receive_response, args=(self.stop_event))
