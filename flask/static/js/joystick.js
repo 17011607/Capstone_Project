@@ -347,7 +347,7 @@
             .joystick2 * {\
                 box-sizing: border-box;\
             }\
-            .joystick2.joystick-show {\
+            .joystick2.joystick2-show {\
                 transition-duration: .2s;\
                 opacity: 1;\
             }\
@@ -375,10 +375,10 @@
                 transition-duration: inherit;\
                 transition-timing-function: inherit;\
             }\
-            .joystick2.joystick-show * {\
+            .joystick2.joystick2-show * {\
                 border-width: 5px;\
             }\
-            .joystick2.joystick-reset * {\
+            .joystick2.joystick2-reset * {\
                 transition-property: border-width, margin;\
                 transition-duration: .1s;\
             }\
