@@ -15,7 +15,7 @@ app = Flask(__name__,
             template_folder=TEMPLATES,
             static_folder=STATIC_FOLDER)
 
-DISTANCE = 10
+DISTANCE = 20
 HEIGHT = 10
 DEGREE = 10
 
@@ -40,6 +40,7 @@ def move_control():
     drone = get_drone()
     while 1:
         if a == temp_a and b == temp_b and height == temp_height and degree == temp_degree:
+            time.sleep(0.01)
             continue
         elif a == 0 and b == 0 and height  == 0 and degree == 0:
             drone.send_command(f"stop")
@@ -49,6 +50,7 @@ def move_control():
         temp_b = b
         temp_height = height
         temp_degree = degree
+        time.sleep(0.01)
 
 @app.route('/')
 def index():
@@ -126,19 +128,19 @@ def command():
         elif direction == 'D':
             b = -DISTANCE
             # print(f"joystic2 : D = {direction}, {a}, {b}")
-        elif direction == 'RU':
+        elif direction == 'LD':
             a = -DISTANCE
             b = -DISTANCE
             # print(f"joystic2 : RU = {direction}, {a}, {b}")
-        elif direction == 'LU' :
+        elif direction == 'RD' : 
             a = DISTANCE
             b = -DISTANCE
             # print(f"joystic2 : LU = {direction}, {a}, {b}")
-        elif direction == 'RD':
+        elif direction == 'LU': # 왼쪽 아래
             a = -DISTANCE
             b = DISTANCE
             # print(f"joystic2 : RD = {direction}, {a}, {b}")
-        elif direction == 'LD':
+        elif direction == 'RU':
             a = DISTANCE
             b = DISTANCE
             # print(f"joystic2 : LD = {direction}, {a}, {b}")
