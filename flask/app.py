@@ -39,19 +39,16 @@ def move_control():
     temp_degree = 0
     drone = get_drone()
     while 1:
-        if a != temp_a or b != temp_b or height != temp_height or degree != temp_degree:
-            drone.send_command(f'stop')
-            print("Drone Stop!")
-        elif a == 0 and b == 0 and height  == 0 and degree == 0:
-            #print(f"continue!")
+        if a == temp_a and b == temp_b and height == temp_height and degree == temp_degree:
             continue
+        elif a == 0 and b == 0 and height  == 0 and degree == 0:
+            drone.send_command(f"stop")
         else:
-            drone.send_command(f'rc {a} {b} {height} {degree}', blocking=False)
+            drone.send_command(f'rc {a} {b} {height} {degree}')
         temp_a = a
         temp_b = b
         temp_height = height
         temp_degree = degree
-        time.sleep(0.01)
 
 @app.route('/')
 def index():
