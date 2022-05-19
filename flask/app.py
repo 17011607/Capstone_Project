@@ -7,6 +7,9 @@ from werkzeug.utils import secure_filename
 from googleDrive import *
 import time
 import threading
+import subprocess
+from multiprocessing import Process, Value, Array, Lock
+import socket
 
 PROJECT_ROOT=os.path.dirname(os.path.abspath(__file__))
 TEMPLATES=os.path.join(PROJECT_ROOT,'templates')
@@ -15,10 +18,9 @@ app = Flask(__name__,
             template_folder=TEMPLATES,
             static_folder=STATIC_FOLDER)
 
-DISTANCE = 20
-HEIGHT = 10
-DEGREE = 10
-
+DISTANCE = 50
+HEIGHT = 50
+DEGREE = 50
 
 def get_drone():
     return DroneManager()
@@ -28,29 +30,34 @@ def video_generator():
     for jpeg in drone.video_jpeg_generator():
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + jpeg + b'\r\n\r\n')
 
-def move_control():
-    global a
-    global b
-    global height
-    global degree
+def move_control(a,b,height,degree):
+    # global a
+    # global b
+    # global height
+    # global degree
     temp_a = 0
     temp_b = 0
     temp_height = 0
     temp_degree = 0
-    drone = get_drone()
+    #socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    #drone = get_drone()
     while 1:
-        if a == temp_a and b == temp_b and height == temp_height and degree == temp_degree:
-            time.sleep(0.01)
+        if a.value == temp_a and b.value == temp_b and height.value == temp_height and degree.value == temp_degree:
+            #print(f"[-] temp_a : {temp_a}, temp_b : {temp_b}, temp_height : {temp_height}, temp_degree : {temp_degree}")
             continue
         elif a == 0 and b == 0 and height  == 0 and degree == 0:
             drone.send_command(f"stop")
+            print(f"Drone Stop!")
         else:
+            print(f"[+] a : {a.value}, b : {b.value}, height : {height.value}, degree : {degree.value}")
+            print(f"[+] temp_a : {temp_a}, temp_b : {temp_b}, temp_height : {temp_height}, temp_degree : {temp_degree}")
+            drone.send_command(f'rc 0 0 0 0')
             drone.send_command(f'rc {a} {b} {height} {degree}')
-        temp_a = a
-        temp_b = b
-        temp_height = height
-        temp_degree = degree
         time.sleep(0.01)
+        temp_a = a.value
+        temp_b = b.value
+        temp_height = height.value
+        temp_degree = degree.value
 
 @app.route('/')
 def index():
@@ -75,79 +82,115 @@ def command():
         global height
         global degree
         direction = request.form.get('direction')
-        height = 0
-        degree = 0
+        height.value = 0
+        degree.value = 0
         if direction == 'N':
-            height = HEIGHT
-            # print(f"joystic1 : N = {direction}, {height}, {degree}")
+            height.value = HEIGHT
+            #height = HEIGHT
+            #print(f"joystic1 : N = {direction}, {height}, {degree}")
         elif direction == 'S':
-            height = -HEIGHT
-            # print(f"joystic1 : S = {direction}, {height}, {degree}")
+            height.value = -HEIGHT
+            #height = -HEIGHT
+            #print(f"joystic1 : S = {direction}, {height}, {degree}")
         elif direction == 'W':
-            degree = DEGREE
-            # print(f"joystic1 : W = {direction}, {height}, {degree}")
+            degree.value = -DEGREE
+            #degree = -DEGREE
+            #print(f"joystic1 : W = {direction}, {height}, {degree}")
         elif direction == 'E':
-            degree = -DEGREE
-            # print(f"joystic1 : E = {direction}, {height}, {degree}")
+            degree.value = DEGREE
+            #degree = DEGREE
+            #print(f"joystic1 : E = {direction}, {height}, {degree}")
         elif direction == 'NW':
-            height = HEIGHT
-            degree = DEGREE
-            # print(f"joystic1 : NW = {direction}, {height}, {degree}")
+            height.value = HEIGHT
+            degree.value = -DEGREE
+            #height = HEIGHT
+            #degree = -DEGREE
+            #print(f"joystic1 : NW = {direction}, {height}, {degree}")
         elif direction == 'NE':
-            height = HEIGHT
-            degree = -DEGREE
-            # print(f"joystic1 : NE = {direction}, {height}, {degree}")
+            height.value = HEIGHT
+            degree.value = DEGREE
+            #height = HEIGHT
+            #degree = DEGREE
+            #print(f"joystic1 : NE = {direction}, {height}, {degree}")
         elif direction == 'SW':
-            height = -HEIGHT
-            degree = DEGREE
-            # print(f"joystic1 : SW = {direction}, {height}, {degree}")
+            height.value = -HEIGHT
+            degree.value = -DEGREE
+            #height = -HEIGHT
+            #degree = -DEGREE
+            #print(f"joystic1 : SW = {direction}, {height}, {degree}")
         elif direction == 'SE':
-            height = -HEIGHT
-            degree = -DEGREE
-            # print(f"joystic1 : SE = {direction}, {height}, {degree}")
+            height.value = -HEIGHT
+            degree.value = DEGREE
+            #height = -HEIGHT
+            #degree = DEGREE
+            #print(f"joystic1 : SE = {direction}, {height}, {degree}")
         else:
-            height = 0
-            degree = 0
-            # print(f"joystic1 : C = {direction}, {height}, {degree}")
+            height.value = 0
+            degree.value = 0
+            #height = 0
+            #degree = 0
+            #print(f"joystic1 : C = {direction}, {height}, {degree}")
         
     elif cmd == "dronemove":
         global a
         global b
         direction = request.form.get('direction')
-        a = 0
-        b = 0
+        a.value = 0
+        b.value = 0
         if direction == 'R' :
-            a = DISTANCE
-            # print(f"joystic2 : R = {direction}, {a}, {b}")
+            a.value = DISTANCE
+            b.value = 0
+            #a = DISTANCE
+            #b = 0
+            #print(f"joystic2 : R = {direction}, {a}, {b}")
         elif direction == 'L' :
-            a = -DISTANCE
-            # print(f"joystic2 : L = {direction}, {a}, {b}")
+            a.value = -DISTANCE
+            b.value = 0
+            #a = -DISTANCE
+            #b = 0
+            #print(f"joystic2 : L = {direction}, {a}, {b}")
         elif direction == 'U' :
-            b = DISTANCE
-            # print(f"joystic2 : U = {direction}, {a}, {b}")
+            a.value = 0
+            b.value = DISTANCE
+            #a = 0
+            #b = DISTANCE
+            #print(f"joystic2 : U = {direction}, {a}, {b}")
         elif direction == 'D':
-            b = -DISTANCE
-            # print(f"joystic2 : D = {direction}, {a}, {b}")
-        elif direction == 'LD':
-            a = -DISTANCE
-            b = -DISTANCE
-            # print(f"joystic2 : RU = {direction}, {a}, {b}")
-        elif direction == 'RD' : 
-            a = DISTANCE
-            b = -DISTANCE
-            # print(f"joystic2 : LU = {direction}, {a}, {b}")
-        elif direction == 'LU': # 왼쪽 아래
-            a = -DISTANCE
-            b = DISTANCE
-            # print(f"joystic2 : RD = {direction}, {a}, {b}")
+            a.value = 0
+            b.value = -DISTANCE
+            #a = 0
+            #b = -DISTANCE
+            #print(f"joystic2 : D = {direction}, {a}, {b}")
         elif direction == 'RU':
-            a = DISTANCE
-            b = DISTANCE
-            # print(f"joystic2 : LD = {direction}, {a}, {b}")
+            a.value = DISTANCE
+            b.value = DISTANCE
+            #a = DISTANCE
+            #b = DISTANCE
+            #print(f"joystic2 : RU = {direction}, {a}, {b}")
+        elif direction == 'LU' :
+            a.value = -DISTANCE
+            b.value = DISTANCE
+            #a = -DISTANCE
+            #b = DISTANCE
+            #print(f"joystic2 : LU = {direction}, {a}, {b}")
+        elif direction == 'RD':
+            a.value = DISTANCE
+            b.value = -DISTANCE
+            #a = DISTANCE
+            #b = -DISTANCE
+            #print(f"joystic2 : RD = {direction}, {a}, {b}")
+        elif direction == 'LD':
+            a.value = -DISTANCE
+            b.value = -DISTANCE
+            #a = -DISTANCE
+            #b = -DISTANCE
+            #print(f"joystic2 : LD = {direction}, {a}, {b}")
         else:
-            a = 0
-            b = 0
-            # print(f"joystic2 : S = {direction}, {a}, {b}")
+            a.value = 0
+            b.value = 0
+            #a = 0
+            #b = 0
+            #print(f"joystic2 : S = {direction}, {a}, {b}")
 
     elif cmd == "takeoff":
         drone.takeoff()
@@ -200,11 +243,31 @@ def snap_shot():
     
 
 if __name__ == '__main__':
-    #cam = camera('192.168.137.47', 4210)
-    a = 0
-    b = 0
-    height = 0
-    degree = 0
-    _move = threading.Thread(target=move_control)
-    _move.start()
+    # if os.fork() == 0:
+    #     # child process
+    #     os.execl('/usr/bin/python3','python3','main.py','./ids','Son')
+    # else:
+    #     # parent Process
+    #     a = 0
+    #     b = 0
+    #     height = 0
+    #     degree = 0
+    #     _move = threading.Thread(target=move_control)
+    #     _move.start()
+    #     app.run(host='0.0.0.0',port="9999", threaded=True)
+    
+    #a = 0
+    #b = 0
+    #height = 0
+    #degree = 0
+    rec_proc = subprocess.Popen(['python','main.py','./ids','Son'])
+    #_move = threading.Thread(target=move_control)
+    #_move.start()
+    a = Value('i', 0)
+    b = Value('i', 0)
+    height = Value('i', 0)
+    degree = Value('i', 0)
+    move_proc = Process(target=move_control, args=(a,b,height,degree))
+    move_proc.start()
+    #move_proc.join()
     app.run(host='0.0.0.0',port="9999", threaded=True)

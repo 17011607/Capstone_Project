@@ -27,12 +27,12 @@ FRAME_AREA = FRAME_X * FRAME_Y
 FRAME_SIZE = FRAME_AREA * 3
 FRAME_CENTER_X = FRAME_X / 2
 FRAME_CENTER_Y = FRAME_Y / 2
-CMD_FFMPEG = f'ffmpeg -hwaccel auto -hwaccel_device opencl -i pipe:0 -pix_fmt bgr24 -s {FRAME_X}x{FRAME_Y} -f rawvideo pipe:1'
+CMD_FFMPEG = f'ffmpeg -hwaccel auto -hwaccel_device opencl -i pipe:0 -pix_fmt bgr24 -s {FRAME_X}x{FRAME_Y} -f rawvideo pipe:1 -f h264 udp://127.0.0.1:5000'
 SNAPSHOT_IMAGE_FOLDER = './static/img/snapshots/'
 
 class DroneManager(metaclass=Singleton):
-    def __init__(self, host_ip='192.168.137.196', host_port=8889, 
-                 drone_ip='192.168.137.143',drone_port=8889,
+    def __init__(self, host_ip='192.168.10.2', host_port=8889, 
+                 drone_ip='192.168.10.1',drone_port=8889,
                  is_imperial=False,speed=DEFAULT_SPEED): # is_imperial은 대충 영국의 길이 기준? 이런거 말하는 건데 false로 설정!
         self.host_ip=host_ip
         self.host_port=host_port
@@ -217,6 +217,7 @@ class DroneManager(metaclass=Singleton):
     def receive_video(self, stop_event, pipe_in, host_ip, video_port):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock_video:
             sock_video.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            #sock_video.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             sock_video.settimeout(.5)
             sock_video.bind((host_ip, video_port))
             data = bytearray(2048)
