@@ -60,26 +60,17 @@
                 left:5px;
                 bottom:30px;
                 z-index:1;
-                background-color: gray;
-            }
-            .joystick div{
-                background-color: red;
             }
             .joystick2{
                 position:absolute;
                 right:5px;
                 bottom:30px;
                 z-index:1;
-                background-color: gray;
-            }
-            .joystick2 div{
-                background-color: red;
             }
             .click_button{
                 position:absolute;
-                left:400px;
+                left:100px;
                 bottom:30px;
-                width:100px;
                 z-index:1;
             }
         </style>
@@ -100,7 +91,7 @@
     <img id="drone_image" src="/video/streaming" style="float:left; width:100%; height:100%; object-fit: cover;">
     <div class="joystick_interface">
         <div data-jquery-element="joystick"></div>
-        <a class = "click_button" href="/video/snapshot" data-role="button" onclick="sendCommand('takeoff'); return false">촬영</a>
+        <div class = "click_button"><a href = "/video/snapshot"><button name="Click"></button></a></div> 
         <div data-jquery-element="joystick2"></div>
     </body>
 </html>
