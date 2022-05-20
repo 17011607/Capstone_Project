@@ -31,29 +31,29 @@ def video_generator():
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + jpeg + b'\r\n\r\n')
 
 def move_control(a,b,height,degree):
-    # global a
-    # global b
-    # global height
-    # global degree
     temp_a = 0
     temp_b = 0
     temp_height = 0
     temp_degree = 0
-    #socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-    #drone = get_drone()
+    move_socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    drone_ip = "192.168.10.1"
+    drone_port = 8889
+    drone_address=(drone_ip,drone_port)
     while 1:
+        #print(f"{a.value}, {b.value}, {height.value}, {degree.value}")
+        #socket.sendto(f"rc 10 0 0 0".encode('utf-8'), drone_address)
         if a.value == temp_a and b.value == temp_b and height.value == temp_height and degree.value == temp_degree:
             #print(f"[-] temp_a : {temp_a}, temp_b : {temp_b}, temp_height : {temp_height}, temp_degree : {temp_degree}")
             continue
-        elif a == 0 and b == 0 and height  == 0 and degree == 0:
-            drone.send_command(f"stop")
+        elif a.value == 0 and b.value == 0 and height.value  == 0 and degree.value == 0:
+            move_socket.sendto(f"stop".encode('utf-8'), drone_address)
+            #drone.send_command(f"stop")
             print(f"Drone Stop!")
         else:
             print(f"[+] a : {a.value}, b : {b.value}, height : {height.value}, degree : {degree.value}")
             print(f"[+] temp_a : {temp_a}, temp_b : {temp_b}, temp_height : {temp_height}, temp_degree : {temp_degree}")
-            drone.send_command(f'rc 0 0 0 0')
-            drone.send_command(f'rc {a} {b} {height} {degree}')
-        time.sleep(0.01)
+            move_socket.sendto(f"rc 0 0 0 0".encode('utf-8'), drone_address)
+            move_socket.sendto(f"rc {a.value} {b.value} {height.value} {degree.value}".encode('utf-8'), drone_address)
         temp_a = a.value
         temp_b = b.value
         temp_height = height.value
@@ -269,5 +269,4 @@ if __name__ == '__main__':
     degree = Value('i', 0)
     move_proc = Process(target=move_control, args=(a,b,height,degree))
     move_proc.start()
-    #move_proc.join()
     app.run(host='0.0.0.0',port="9999", threaded=True)
