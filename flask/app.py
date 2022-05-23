@@ -1,5 +1,6 @@
 import os
 from re import A, X
+from urllib import request
 from flask import *
 from camera import camera
 from drone_manager import DroneManager
@@ -10,6 +11,7 @@ import threading
 import subprocess
 from multiprocessing import Process, Value, Array, Lock
 import socket
+import shutil
 
 PROJECT_ROOT=os.path.dirname(os.path.abspath(__file__))
 TEMPLATES=os.path.join(PROJECT_ROOT,'templates')
@@ -68,6 +70,14 @@ def drone_battery():
     drone = get_drone()
     battery = drone.battery()
     return jsonify({"battery":battery})
+
+@app.route('/user_list')
+def user_list():
+    files=os.listdir('./ids')
+    data={}
+    for file in files:
+        data[f"{file}"]=file
+    return jsonify(data)
 
 @app.route('/controller/')
 def controller():
@@ -227,6 +237,50 @@ def ap():
     password = request.form.get('password')
     drone.send_command(f'ap {ssid} {password}')
     return render_template('setting.html')
+
+@app.route('/setting/regist_file', methods=['GET','POST'])
+def regist_file(): # 프론트에서 파일을 못가져옴...ㅠㅠ
+    name=request.form.get('user_name')
+    f = request.files['file']
+    os.makedirs(f"./ids/{name}", exist_ok=True)
+    f.save(f"./ids/{name}",f"{name}.jpg")
+    return render_template('regist_fileupload.html')
+
+@app.route('/setting/regist_snapshot', methods=['POST'])
+def regist_snapshot():
+    name=request.form.get('user_name')
+    os.makedirs(f"./ids/{name}", exist_ok=True)
+    os.replace("./static/img/snapshots/snapshot.jpg",f"./ids/{name}/{name}.jpg")
+    return render_template('regist_snapshot.html')
+
+@app.route('/setting/user_delete', methods=['POST'])
+def user_delete():
+    name=request.form.get('user_name')
+    shutil.rmtree(f"./ids/{name}")
+    return render_template('regist_delete.html')
+
+
+
+@app.route('/regist/')
+def regist():
+    return render_template('regist.html')
+
+
+@app.route('/regist/regist_user')
+def regist_user_page():
+    return render_template('regist_user.html')
+
+@app.route('/regist/regist_snapshot')
+def regist_snpashot_page():
+    return render_template('regist_snapshot.html')
+
+@app.route('/regist/regist_fileupload')
+def regist_fileupload_page():
+    return render_template('regist_fileupload.html')
+
+@app.route('/regist/regist_delete/')
+def regist_delete_page():
+    return render_template('regist_delete.html')
 
 @app.route('/about/')
 def about():
