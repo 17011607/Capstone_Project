@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <title>Drone App</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="../static/css/jquery.mobile-1.4.5.min.css" />
+        <script src="../static/js/jquery-1.11.1.min.js"></script>
+        <script src="../static/js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="../static/js/file_upload.js"></script>
+        <style>
+            .setting-box{
+                position:relative;
+                text-align: center;
+            }   
+        </style>
+        <script>
+            var sendCommand=(command,params={})=>{
+                console.log({action:'sendCommand',command:command,params:params})   
+                params['command']=command
+                $.post("/api/command/",params).done((json)=>{
+                    console.log({action:'sendCommand',json:json})
+                },'json')
+            }
+            var check
+        </script>
+    </head>
+    <body>
+        <div data-role="page">
+            <div data-role="header">
+                <a href="javascript:location.href='/'" data-icon="home" data-dom-cache="false">Home</a>
+                <h1> Drone App </h1>
+            </div>
+
+            <div data-role="content">
+                <div class="setting-box">
+                    <h1>User Regist Page</h1>
+                </div>
+                <div class="setting-box" style="text-align:left">
+                    <h3>User Regist-snapshot</h3>
+                </div>
+                <img id="drone_image" src="/video/streaming" style="float:left; width:100%; height:100%; object-fit: cover;">
+                <form action="http://localhost:9999/setting/regist_snapshot" method="post">
+                    Name: <input type="text" name="user_name">
+                    <a class = "click_button" href="/video/snapshot" data-role="button">촬영</a>
+                    <input type="submit"  value="제출">
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
