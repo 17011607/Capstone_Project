@@ -243,6 +243,8 @@ def regist_file(): # 프론트에서 파일을 못가져옴...ㅠㅠ
     name=request.form.get('user_name')
     f = request.files['file']
     os.makedirs(f"./ids/{name}", exist_ok=True)
+    os.makedirs(f"./static/img/profile/{name}", exist_ok=True)
+    shutil.copy("./static/img/profile.jpg",f"./static/img/profile/{name}/profile.jpg")
     f.save(f"./ids/{name}",f"{name}.jpg")
     return render_template('regist_fileupload.html')
 
@@ -251,15 +253,16 @@ def regist_snapshot():
     name=request.form.get('user_name')
     os.makedirs(f"./ids/{name}", exist_ok=True)
     os.replace("./static/img/snapshots/snapshot.jpg",f"./ids/{name}/{name}.jpg")
+    os.makedirs(f"./static/img/profile/{name}", exist_ok=True)
+    shutil.copy("./static/img/profile.jpg",f"./static/img/profile/{name}/profile.jpg")
     return render_template('regist_snapshot.html')
 
 @app.route('/setting/user_delete', methods=['POST'])
 def user_delete():
     name=request.form.get('user_name')
     shutil.rmtree(f"./ids/{name}")
+    shutil.rmtree(f"./static/img/profile/{name}")
     return render_template('regist_delete.html')
-
-
 
 @app.route('/regist/')
 def regist():
