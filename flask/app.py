@@ -77,6 +77,8 @@ def user_list():
     data={}
     for file in files:
         data[f"{file}"]=file
+    if data=={}:
+        return 0
     return jsonify(data)
 
 @app.route('/controller/')
@@ -260,6 +262,8 @@ def regist_snapshot():
 @app.route('/setting/user_delete', methods=['POST'])
 def user_delete():
     name=request.form.get('user_name')
+    if os.path.isdir(f"./ids/{name}")==False:
+        return render_template('regist_delete.html')
     shutil.rmtree(f"./ids/{name}")
     shutil.rmtree(f"./static/img/profile/{name}")
     return render_template('regist_delete.html')
@@ -269,10 +273,6 @@ def regist():
     return render_template('regist.html')
 
 
-@app.route('/regist/regist_user')
-def regist_user_page():
-    return render_template('regist_user.html')
-
 @app.route('/regist/regist_snapshot')
 def regist_snpashot_page():
     return render_template('regist_snapshot.html')
@@ -281,9 +281,9 @@ def regist_snpashot_page():
 def regist_fileupload_page():
     return render_template('regist_fileupload.html')
 
-@app.route('/regist/regist_delete/')
+@app.route('/regist/regist_del')
 def regist_delete_page():
-    return render_template('regist_delete.html')
+    return render_template('regist_del.html')
 
 @app.route('/about/')
 def about():
