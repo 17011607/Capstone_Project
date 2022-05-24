@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <title>Drone App</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="../static/css/jquery.mobile-1.4.5.min.css" />
+        <script src="../static/js/jquery-1.11.1.min.js"></script>
+        <script src="../static/js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="../static/js/file_upload.js"></script>
+        <style>
+            .setting-box{
+                position:relative;
+                text-align: center;
+            }   
+        </style>
+        <script>
+            var sendCommand=(command,params={})=>{
+                console.log({action:'sendCommand',command:command,params:params})   
+                params['command']=command
+                $.post("/api/command/",params).done((json)=>{
+                    console.log({action:'sendCommand',json:json})
+                },'json')
+            }
+        
+            $(document).on('pageinit',(event)=>{
+                $('#slider-2').on("slidestop",()=>{
+                    let params={
+                        speed: $("#slider-2").val(),
+                    };
+                    sendCommand('speed',params)
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <div data-role="page">
+            <div data-role="header">
+                <a href="javascript:location.href='/'" data-icon="home" data-dom-cache="false">Home</a>
+                <h1> Drone App </h1>
+            </div>
+
+            <div data-role="content">
+                <div class="setting-box">
+                    <h1>Settings</h1>
+                </div>
+                <form>
+                    <div class="setting-box" style="text-align:left">
+                        <h3>Drone Speed</h3>
+                    </div>
+                    <input type="range" name="slider-2" id="slider-2" data-highlight="true" min="10" max="100" value="50">
+                </form>
+                <br><br>
+                <div class="wrap">
+                    <div class="setting-box" style="text-align:left">
+                        <h3>Google Drive</h3>
+                    </div>
+                    <form action="http://localhost:9999/setting/get_credentials" method="post" enctype="multipart/form-data">
+                        <input type="file" name="file">
+                        <input type = "submit" value = "제출">
+                    </form>    
+                </div>
+                <br><br>
+                <div class="setting-box" style="text-align:left">
+                    <h3>WiFi Connect</h3>
+                </div>
+                <form action="http://localhost:9999/setting/ap" method="post">
+                    SSID : <input type="text" name="SSID">
+                    Password : <input type="password" name="password">
+                    <input type="submit" value = "연결">
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
