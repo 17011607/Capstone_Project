@@ -27,7 +27,7 @@
                 })
                 .done(function(data){
                     var str=''
-                    str += `<ul style="text-align:center;">`
+                    str += `<ul>`
                     for(id in data){
                         str += `<li style="display:inline-block; width:100px; height:100px; float:left; margin:30px;">`
                         str += `<img src='../static/img/profile/${id}/profile.jpg' style="width:100px; height:100px; display:inline;">`
@@ -125,7 +125,7 @@
                         <div class="Label">100%</div>
                     </div>
                 </div>
-                <div id="userlist">
+                <div id="userlist" style="display:flex;justify-content:center;margin-bottom:30px;">
                 </div>
                 <div id="Menu" style="display:block;">
                     <ul data-role="listview">
