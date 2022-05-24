@@ -20,7 +20,15 @@
                     console.log({action:'sendCommand',json:json})
                 },'json')
             }
-            var check
+            var form_submit=()=>{
+                if(document.getElementsByName("user_name")[0].value==''){
+                    alert('사용자 이름을 입력해주세요!');
+                    check_submit=0;
+                    return check_submit;
+                }
+                var check_submit=confirm('사용자 등록을 하시겠습니까?');
+                return check_submit;
+            }
         </script>
     </head>
     <body>
@@ -34,7 +42,7 @@
                 <div class="setting-box" style="text-align:left">
                     <h3>User Regist-upload</h3>
                 </div>
-                <form action="http://localhost:9999/setting/regist_file" method="post" enctype="multipart/form-data">
+                <form action="http://localhost:9999/setting/regist_file" method="post" onSubmit="return check_submit()" enctype="multipart/form-data">
                     Name: <input type="text" name="user_name">
                     <input type="file" name="file">
                     <input type="submit" value="제출">

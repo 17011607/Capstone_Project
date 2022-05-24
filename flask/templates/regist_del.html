@@ -21,24 +21,16 @@
                 },'json')
             }
             var form_submit=()=>{
-                if(document.getElementsByName("user_name")[0].value==''){
-                    alert('사용자 이름을 입력해주세요!');
-                    check_submit=0;
-                    return check_submit;
-                }
-                var check_submit=confirm('사용자 등록을 하시겠습니까?');
-                return check_submit;
-            }
-            var snapshot_check=()=>{
                 var name=document.getElementsByName("user_name")[0].value;
                 if(name==''){
                     alert('사용자 이름을 입력해주세요!');
                     check_submit=0;
                     return check_submit;
                 }
-                var check_submit=confirm('사진 촬영을 하시겠습니까?');
+                var check_submit=confirm(`${name} 사용자를 삭제을 하시겠습니까?`);
                 return check_submit;
             }
+            var check
         </script>
     </head>
     <body>
@@ -49,17 +41,12 @@
             </div>
 
             <div data-role="content">
-                <div class="setting-box">
-                    <h1>User Regist Page</h1>
-                </div>
                 <div class="setting-box" style="text-align:left">
-                    <h3>User Regist-snapshot</h3>
+                    <h3>User Delete</h3>
                 </div>
-                <img id="drone_image" src="/video/streaming" style="float:left; width:100%; height:100%; object-fit: cover;">
-                <form action="http://localhost:9999/setting/regist_snapshot" method="post" onSubmit="return form_submit()">
+                <form action="http://localhost:9999/setting/user_delete" onSubmit="return form_submit()" method="post">
                     Name: <input type="text" name="user_name">
-                    <a class = "click_button" href="/video/snapshot" data-role="button" onclick="return snapshot_check()">촬영</a>
-                    <input type="submit"  value="제출">
+                    <input type="submit" value="제출">
                 </form>
             </div>
         </div>

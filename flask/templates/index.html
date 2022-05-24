@@ -26,14 +26,21 @@
                     async:false
                 })
                 .done(function(data){
-                    var num=1
-                    var str=''
-                    for(id in data){
-                        str+=`<a href="#" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all" onclick="return false">사용자 ${num} : ${id}</a>`
-                        console.log(str)
-                        num+=1
+                    if(data==0){
+                        return;
                     }
-                    document.querySelector('#user').innerHTML+=str;
+                    var str=''
+                    str += `<ul>`
+                    for(id in data){
+                        str += `<li style="display:inline-block; width:100px; height:100px; float:left; margin:30px;">`
+                        str += `<img src='../static/img/profile/${id}/profile.jpg' style="width:100px; height:100px; display:inline;">`
+                        str+=`<a href="#" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all user" onclick="return false" style="width:50px; margin-left:10px;">${id}</a>`
+                        str += `</li>`
+                    }
+                    str += `</ul>`
+                    str += `<br><br><br><br><br><br><br><br><br><br>`
+                    console.log(str)
+                    document.querySelector('#userlist').innerHTML+=str;
                 })
                 $.ajax({
                     url:"/battery",
@@ -104,13 +111,6 @@
                 <a href="javascript:location.href='/'" data-icon="home" data-dom-cache="false">Home</a>
                 <h1> Drone App </h1>
             </div>
-            <div data-role="collapsibleset" data-filter="true" data-inset="true" id="collapsiblesetForFilter" data-input="#searchForCollapsibleSet">
-                <div data-role="collapsible">
-                    <h3>사용자 등록 현황</h3>
-                    <ul data-role="listview" data-inset="false" id="user">
-                    </ul>
-                </div>
-            </div>
             <div data-role="content">
                 <div align="center">
                     <h1> Drone App </h1>
@@ -128,13 +128,16 @@
                         <div class="Label">100%</div>
                     </div>
                 </div>
-                <br><br>
-                <ul data-role="listview">
-                    <li><a href="javascript:location.href='/controller'">Controller</a></li>
-                    <li><a href="javascript:location.href='/setting'">Setting</a></li>
-                    <li><a href="javascript:location.href='/regist'">User Regist</a></li>
-                    <li><a href="javascript:location.href='/about'">about</a></li>
-                </ul>
+                <div id="userlist" style="display:flex;justify-content:center;margin-bottom:30px;">
+                </div>
+                <div id="Menu" style="display:block;">
+                    <ul data-role="listview">
+                        <li><a href="javascript:location.href='/controller'">Controller</a></li>
+                        <li><a href="javascript:location.href='/setting'">Setting</a></li>
+                        <li><a href="javascript:location.href='/regist'">User Regist & Delete</a></li>
+                        <li><a href="javascript:location.href='/about'">about</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </body>
