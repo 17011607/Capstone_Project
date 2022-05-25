@@ -12,6 +12,7 @@ import subprocess
 from multiprocessing import Process, Value, Array, Lock
 import socket
 import shutil
+import requests
 
 PROJECT_ROOT=os.path.dirname(os.path.abspath(__file__))
 TEMPLATES=os.path.join(PROJECT_ROOT,'templates')
@@ -77,8 +78,6 @@ def user_list():
     data={}
     for file in files:
         data[f"{file}"]=file
-    if data=={}:
-        return 0
     return jsonify(data)
 
 @app.route('/controller/')
@@ -224,13 +223,30 @@ def command():
 def setting():
     return render_template('setting.html')
 
-@app.route('/setting/get_credentials', methods=['POST'])
+@app.route('/setting/get_credentials')
 def get_credentials():
-    f = request.files['file']
-    os.makedirs("./credentials", exist_ok=True)
-    f.save("./credentials/credentials.json")
-    make_token()
-    return render_template('setting.html')
+    # make token
+    client_id="303423050557-q0j988opbao7sgqefm2roi7cam0rk1i6.apps.googleusercontent.com"
+    redirect_uri="http://localhost:9999/authcode"
+    scope="https://www.googleapis.com/auth/drive.file"
+    response_type="code"
+    url = "https://accounts.google.com/o/oauth2/v2/auth"
+    return redirect(f"{url}?client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&response_type={response_type}")
+
+@app.route('/authcode', methods=['GET'])
+def google_auth():
+    code = request.args.get('code')
+    data = {
+        "code":code,
+        "client_id":"303423050557-q0j988opbao7sgqefm2roi7cam0rk1i6.apps.googleusercontent.com",
+        "client_secret":"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",
+        "redirect_uri":"http://localhost:9999/authcode",
+        "grant_type":"authorization_code"
+    }
+    response = requests.post('https://oauth2.googleapis.com/token', data=data)
+    with open("token.json", "w") as f:
+        f.write(response.text)
+    return "ok"
 
 @app.route('/setting/ap', methods=['POST'])
 def ap():
@@ -245,8 +261,6 @@ def regist_file(): # 프론트에서 파일을 못가져옴...ㅠㅠ
     name=request.form.get('user_name')
     f = request.files['file']
     os.makedirs(f"./ids/{name}", exist_ok=True)
-    os.makedirs(f"./static/img/profile/{name}", exist_ok=True)
-    shutil.copy("./static/img/profile.jpg",f"./static/img/profile/{name}/profile.jpg")
     f.save(f"./ids/{name}",f"{name}.jpg")
     return render_template('regist_fileupload.html')
 
@@ -255,23 +269,25 @@ def regist_snapshot():
     name=request.form.get('user_name')
     os.makedirs(f"./ids/{name}", exist_ok=True)
     os.replace("./static/img/snapshots/snapshot.jpg",f"./ids/{name}/{name}.jpg")
-    os.makedirs(f"./static/img/profile/{name}", exist_ok=True)
-    shutil.copy("./static/img/profile.jpg",f"./static/img/profile/{name}/profile.jpg")
     return render_template('regist_snapshot.html')
 
 @app.route('/setting/user_delete', methods=['POST'])
 def user_delete():
     name=request.form.get('user_name')
-    if os.path.isdir(f"./ids/{name}")==False:
-        return render_template('regist_delete.html')
     shutil.rmtree(f"./ids/{name}")
-    shutil.rmtree(f"./static/img/profile/{name}")
     return render_template('regist_delete.html')
+
+
+
 
 @app.route('/regist/')
 def regist():
     return render_template('regist.html')
 
+
+@app.route('/regist/regist_user')
+def regist_user_page():
+    return render_template('regist_user.html')
 
 @app.route('/regist/regist_snapshot')
 def regist_snpashot_page():
@@ -281,9 +297,9 @@ def regist_snpashot_page():
 def regist_fileupload_page():
     return render_template('regist_fileupload.html')
 
-@app.route('/regist/regist_del')
+@app.route('/regist/regist_delete/')
 def regist_delete_page():
-    return render_template('regist_del.html')
+    return render_template('regist_delete.html')
 
 @app.route('/about/')
 def about():
@@ -297,6 +313,13 @@ def video_feed():
 def snap_shot():
     drone = get_drone()
     drone.snapshot()
+    try:
+        with open('token.json', 'r') as json_file:
+            json_data = json.load(json_file)
+            access_token = json_data['access_token']
+            upload(access_token,"./static/img/snapshots/snapshot.jpg")
+    except:
+        pass
     
 
 if __name__ == '__main__':
