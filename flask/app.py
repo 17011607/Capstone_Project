@@ -6,8 +6,6 @@ from camera import camera
 from drone_manager import DroneManager
 from werkzeug.utils import secure_filename
 from googleDrive import *
-import time
-import threading
 import subprocess
 from multiprocessing import Process, Value, Array, Lock
 import socket
@@ -20,6 +18,8 @@ STATIC_FOLDER=os.path.join(PROJECT_ROOT,'static')
 app = Flask(__name__,
             template_folder=TEMPLATES,
             static_folder=STATIC_FOLDER)
+
+app.config['STATIC_FOLDER'] = STATIC_FOLDER
 
 DISTANCE = 50
 HEIGHT = 50
@@ -256,38 +256,48 @@ def ap():
     drone.send_command(f'ap {ssid} {password}')
     return render_template('setting.html')
 
+@app.route('/setting/regist_file', methods=['POST'])
+def regist_file(): # 프론트에서 파일을 못가져옴...ㅠㅠ
+    name=request.form.get('user_name')
+    f = request.files['file']
+    os.makedirs(f"./ids/{name}", exist_ok=True)
+    os.makedirs(f"./static/img/profile/{name}", exist_ok=True)
+    shutil.copy("./static/img/profile.jpg",f"./static/img/profile/{name}/profile.jpg")
+    f.save(os.path.join(app.config['STATIC_FOLDER'], "1.jpg"))
+    os.replace("./static/1.jpg",f"./ids/{name}/{name}.jpg")
+    return render_template('regist_fileupload.html')
+'''
 @app.route('/setting/regist_file', methods=['GET','POST'])
 def regist_file(): # 프론트에서 파일을 못가져옴...ㅠㅠ
     name=request.form.get('user_name')
     f = request.files['file']
     os.makedirs(f"./ids/{name}", exist_ok=True)
+    os.makedirs(f"./static/img/profile/{name}", exist_ok=True)
+    shutil.copy("./static/img/profile.jpg",f"./static/img/profile/{name}/profile.jpg")
     f.save(f"./ids/{name}",f"{name}.jpg")
     return render_template('regist_fileupload.html')
-
+'''
 @app.route('/setting/regist_snapshot', methods=['POST'])
 def regist_snapshot():
     name=request.form.get('user_name')
     os.makedirs(f"./ids/{name}", exist_ok=True)
     os.replace("./static/img/snapshots/snapshot.jpg",f"./ids/{name}/{name}.jpg")
+    os.makedirs(f"./static/img/profile/{name}", exist_ok=True)
+    shutil.copy("./static/img/profile.jpg",f"./static/img/profile/{name}/profile.jpg")
     return render_template('regist_snapshot.html')
 
 @app.route('/setting/user_delete', methods=['POST'])
 def user_delete():
     name=request.form.get('user_name')
+    if os.path.isdir(f"./ids/{name}")==False:
+        return render_template('regist_del.html')
     shutil.rmtree(f"./ids/{name}")
-    return render_template('regist_delete.html')
-
-
-
+    shutil.rmtree(f"./static/img/profile/{name}")
+    return render_template('regist_del.html')
 
 @app.route('/regist/')
 def regist():
     return render_template('regist.html')
-
-
-@app.route('/regist/regist_user')
-def regist_user_page():
-    return render_template('regist_user.html')
 
 @app.route('/regist/regist_snapshot')
 def regist_snpashot_page():
@@ -297,9 +307,9 @@ def regist_snpashot_page():
 def regist_fileupload_page():
     return render_template('regist_fileupload.html')
 
-@app.route('/regist/regist_delete/')
+@app.route('/regist/regist_del')
 def regist_delete_page():
-    return render_template('regist_delete.html')
+    return render_template('regist_del.html')
 
 @app.route('/about/')
 def about():
