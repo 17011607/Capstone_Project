@@ -37,6 +37,9 @@
                 })
             })
             var delete_user=(name)=>{
+                if(form_submit(name)==false){
+                    return;
+                }
                 var sendData="user_name="+name;
                 $.ajax({
                     type:'post',
@@ -44,6 +47,7 @@
                     data:sendData,
                     async:false
                 })
+                location.reload();
             }
 
             var sendCommand=(command,params={})=>{
@@ -53,13 +57,7 @@
                     console.log({action:'sendCommand',json:json})
                 },'json')
             }
-            var form_submit=()=>{
-                var name=document.getElementsByName("user_name")[0].value;
-                if(name==''){
-                    alert('사용자 이름을 입력해주세요!');
-                    check_submit=0;
-                    return check_submit;
-                }
+            var form_submit=(name)=>{
                 var check_submit=confirm(`${name} 사용자를 삭제을 하시겠습니까?`);
                 return check_submit;
             }

@@ -37,7 +37,13 @@
                     return check_submit;
                 }
                 var check_submit=confirm('사진 촬영을 하시겠습니까?');
-                return check_submit;
+                if(check_submit==true){
+                    $.ajax({
+                        url:"/video/snapshot",
+                        async:false
+                    })
+                    document.querySelector('#drone_image').src="../static/img/snapshots/snapshot.jpg";
+                }
             }
         </script>
     </head>
@@ -55,10 +61,11 @@
                 <div class="setting-box" style="text-align:left">
                     <h3>User Regist-snapshot</h3>
                 </div>
-                <img id="drone_image" src="/video/streaming" style="float:left; width:100%; height:100%; object-fit: cover;">
+                <div class="shot"></div>
+                <img id="drone_image" src="/video/streaming" style="float:left; width:100%; height:70%; object-fit: cover;">
                 <form action="http://localhost:9999/setting/regist_snapshot" method="post" onSubmit="return form_submit()">
                     Name: <input type="text" name="user_name">
-                    <a class = "click_button" href="/video/snapshot" data-role="button" onclick="return snapshot_check()">촬영</a>
+                    <a class = "click_button" href="#" data-role="button" onclick="return snapshot_check()">촬영</a>
                     <input type="submit"  value="등록">
                 </form>
             </div>
