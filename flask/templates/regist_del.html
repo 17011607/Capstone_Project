@@ -27,7 +27,7 @@
                     for(id in data){
                         str += `<li style="display:inline-block; width:100px; height:100px; float:left; margin:30px;">`
                         str += `<img src='../static/img/profile/${id}/profile.jpg' style="width:100px; height:100px; display:inline;">`
-                        str+=`<a href="#" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all user" onclick="return false" style="width:50px; margin-left:10px;">${id}</a>`
+                        str+=`<a href="#" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all user" onclick="return delete_user('${id}')" style="width:50px; margin-left:10px;">${id}</a>`
                         str += `</li>`
                     }
                     str += `</ul>`
@@ -36,6 +36,16 @@
                     document.querySelector('#userlist').innerHTML+=str;
                 })
             })
+            var delete_user=(name)=>{
+                var sendData="user_name="+name;
+                $.ajax({
+                    type:'post',
+                    url:"/setting/user_delete",
+                    data:sendData,
+                    async:false
+                })
+            }
+
             var sendCommand=(command,params={})=>{
                 console.log({action:'sendCommand',command:command,params:params})   
                 params['command']=command
@@ -64,15 +74,12 @@
             </div>
 
             <div data-role="content">
-                <div class="setting-box" style="text-align:left">
-                    <h3>User Delete</h3>
+                <div class="setting-box">
+                    <h1>User Delete Page</h1><br>
                 </div>
-                <div id="userlist" style="display:flex;justify-content:center;margin-bottom:30px;">
+                <h4 style="text-align:center"><< 삭제할 사용자의 이름을 클릭해주세요. >></h4>
+                <div id="userlist" style="display:flex;justify-content:center;margin-bottom:30px;border:0px solid; background-color:#5b6dcd80; padding-bottom:30px; border-radius:30px">
                 </div>
-                <form action="http://localhost:9999/setting/user_delete" onSubmit="return form_submit()" method="post">
-                    Name: <input type="text" name="user_name">
-                    <input type="submit" value="삭제">
-                </form>
             </div>
         </div>
     </body>
