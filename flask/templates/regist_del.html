@@ -13,6 +13,29 @@
             }   
         </style>
         <script>
+            $(()=>{
+                $.ajax({
+                    url:"/user_list",
+                    async:false
+                })
+                .done(function(data){
+                    if(data==0){
+                        return;
+                    }
+                    var str=''
+                    str += `<ul>`
+                    for(id in data){
+                        str += `<li style="display:inline-block; width:100px; height:100px; float:left; margin:30px;">`
+                        str += `<img src='../static/img/profile/${id}/profile.jpg' style="width:100px; height:100px; display:inline;">`
+                        str+=`<a href="#" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all user" onclick="return false" style="width:50px; margin-left:10px;">${id}</a>`
+                        str += `</li>`
+                    }
+                    str += `</ul>`
+                    str += `<br><br><br><br><br><br><br><br><br><br>`
+                    console.log(str)
+                    document.querySelector('#userlist').innerHTML+=str;
+                })
+            })
             var sendCommand=(command,params={})=>{
                 console.log({action:'sendCommand',command:command,params:params})   
                 params['command']=command
@@ -44,9 +67,11 @@
                 <div class="setting-box" style="text-align:left">
                     <h3>User Delete</h3>
                 </div>
+                <div id="userlist" style="display:flex;justify-content:center;margin-bottom:30px;">
+                </div>
                 <form action="http://localhost:9999/setting/user_delete" onSubmit="return form_submit()" method="post">
                     Name: <input type="text" name="user_name">
-                    <input type="submit" value="제출">
+                    <input type="submit" value="삭제">
                 </form>
             </div>
         </div>
