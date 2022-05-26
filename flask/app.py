@@ -1,5 +1,5 @@
 import os
-from re import A, X
+from re import A, X, match
 from urllib import request
 from flask import *
 from camera import camera
@@ -61,6 +61,23 @@ def move_control(a,b,height,degree):
         temp_b = b.value
         temp_height = height.value
         temp_degree = degree.value
+
+def get_processes_running():
+    # 영어일때는 `ignore` 인자 없어도 됨  
+    tasks = subprocess.check_output(['tasklist']).decode('cp949', 'ignore').split("\r\n")
+    p = []
+    for task in tasks:
+        m = match("(.+?) +(\d+) (.+?) +(\d+) +(\d+.* K).*",task)
+        if m is not None:
+            p.append({"image":m.group(1),
+                        "pid":m.group(2),
+                        "session_name":m.group(3),
+                        "session_num":m.group(4),
+                        "mem_usage":m.group(5)
+                        })
+    return p
+
+
 
 @app.route('/')
 def index():
@@ -331,28 +348,19 @@ def snap_shot():
     except:
         pass
     
+@app.route('/user_select', methods=['GET'])
+def user_select():
+    global rec_proc
+    try:
+        rec_proc.kill()
+    except:
+        pass
+    name = request.args.get('name')
+    rec_proc = subprocess.Popen(['python','main.py','./ids',name])
+    return render_template('index.html')
 
 if __name__ == '__main__':
-    # if os.fork() == 0:
-    #     # child process
-    #     os.execl('/usr/bin/python3','python3','main.py','./ids','Son')
-    # else:
-    #     # parent Process
-    #     a = 0
-    #     b = 0
-    #     height = 0
-    #     degree = 0
-    #     _move = threading.Thread(target=move_control)
-    #     _move.start()
-    #     app.run(host='0.0.0.0',port="9999", threaded=True)
-    
-    #a = 0
-    #b = 0
-    #height = 0
-    #degree = 0
-    rec_proc = subprocess.Popen(['python','main.py','./ids','Son'])
-    #_move = threading.Thread(target=move_control)
-    #_move.start()
+    global rec_proc
     a = Value('i', 0)
     b = Value('i', 0)
     height = Value('i', 0)
