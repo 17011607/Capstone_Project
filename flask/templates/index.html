@@ -20,6 +20,13 @@
                 }
                 return LED;
             }
+            
+            var user_select=(id)=>{
+                if(confirm(`${id} 사용자를 추적 하시겠습니까?`)==true){
+                    location.href =`http://localhost:9999/user_select?name=${id}`;
+                    alert('설정 완료!');
+                }
+            }
             $(()=>{
                 $.ajax({
                     url:"/user_list",
@@ -34,7 +41,7 @@
                     for(id in data){
                         str += `<li style="display:inline-block; width:100px; height:100px; float:left; margin:30px;">`
                         str += `<img src='../static/img/profile/${id}/profile.jpg' style="width:100px; height:100px; display:inline;">`
-                        str+=`<a href="#" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all user" onclick="location.href ='http://localhost:9999/user_select?name=${id}';" style="width:50px; margin-left:10px;">${id}</a>`
+                        str+=`<a href="#" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all user" onclick="user_select('${id}')" style="width:50px; margin-left:10px;">${id}</a>`
                         str += `</li>`
                     }
                     str += `</ul>`
