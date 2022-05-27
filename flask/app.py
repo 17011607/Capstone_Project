@@ -289,6 +289,19 @@ def user_delete():
     shutil.rmtree(f"./static/img/profile/{name}")
     return render_template('regist_del.html')
 
+@app.route('/setting/gesture', methods=['POST'])
+def set_gesture():
+    f=open("gesture.json","w")
+    data=request.json
+    print(data)
+    f.write(data)
+    f.close()
+    return render_template('gesture.html')
+
+@app.route('/gesture')
+def gesture_page():
+    return render_template('gesture.html')
+
 @app.route('/regist/')
 def regist():
     return render_template('regist.html')
