@@ -294,7 +294,7 @@ def set_gesture():
     f=open("gesture.json","w")
     data=request.json
     print(data)
-    f.write(data)
+    f.write(json.dumps(data))
     f.close()
     return render_template('gesture.html')
 
