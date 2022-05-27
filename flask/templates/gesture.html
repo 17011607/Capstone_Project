@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <title>Drone App</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="../static/css/jquery.mobile-1.4.5.min.css" />
+        <script src="../static/js/jquery-1.11.1.min.js"></script>
+        <script src="../static/js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="../static/js/file_upload.js"></script>
+        <style>
+            .setting-box{
+                position:relative;
+                text-align: center;
+            }   
+        </style>
+        <script>
+            var sendCommand=(command,params={})=>{
+                console.log({action:'sendCommand',command:command,params:params})   
+                params['command']=command
+                $.post("/api/command/",params).done((json)=>{
+                    console.log({action:'sendCommand',json:json})
+                },'json')
+            }
+            var form_submit=()=>{
+                var check_submit=confirm('사용자 등록을 하시겠습니까?');
+                if(check_submit==false){
+                    return
+                }
+                var Data={
+                    "0":document.getElementById(`select-native-0`).value,
+                    "1":document.getElementById(`select-native-1`).value,
+                    "2":document.getElementById(`select-native-2`).value,
+                    "3":document.getElementById(`select-native-3`).value,
+                    "4":document.getElementById(`select-native-4`).value,
+                    "5":document.getElementById(`select-native-5`).value,
+                    "6":document.getElementById(`select-native-6`).value,
+                }
+                $.ajax({
+                    type:'post',
+                    url:"/setting/gesture",
+                    headers:{'Content-Type':'application/json'},
+                    data:JSON.stringify(Data),
+                    async:false,
+                    success:(data)=>{
+                        alert('설정 완료!')
+                    }
+                })
+            }
+        </script>
+    </head>
+    <body>
+        <div data-role="page">
+            <div data-role="header">
+                <a href="javascript:location.href='/'" data-icon="home" data-dom-cache="false">Home</a>
+                <h1> Drone App </h1>
+            </div>
+
+            <div data-role="content">
+                <div class="setting-box">
+                    <h1>User Gesture Setting</h1>
+                </div>
+                <form>
+                    <div class="ui-field-contain">
+                        <label for="select-native-0">손바닥:</label>
+                        <select name="select-native-0" id="select-native-0" data-mini="true">
+                            <option value="0">STOP</option>
+                            <option value="1">LAND</option>
+                            <option value="2">SNAPSHOT</option>
+                            <option value="3">Left Move</option>
+                            <option value="4">Right Move</option>
+                            <option value="5">Up Move</option>
+                            <option value="6">Down Move</option>
+                        </select>
+                    </div>
+                </form>
+                <form>
+                    <div class="ui-field-contain">
+                        <label for="select-native-1">주먹:</label>
+                        <select name="select-native-1" id="select-native-1" data-mini="true">
+                            <option value="0">STOP</option>
+                            <option value="1" selected>LAND</option>
+                            <option value="2">SNAPSHOT</option>
+                            <option value="3">Left Move</option>
+                            <option value="4">Right Move</option>
+                            <option value="5">Up Move</option>
+                            <option value="6">Down Move</option>
+                        </select>
+                    </div>
+                </form>
+                <form>
+                    <div class="ui-field-contain">
+                        <label for="select-native-2">손가락:</label>
+                        <select name="select-native-2" id="select-native-2" data-mini="true">
+                            <option value="0">STOP</option>
+                            <option value="1">LAND</option>
+                            <option value="2" selected>SNAPSHOT</option>
+                            <option value="3">Left Move</option>
+                            <option value="4">Right Move</option>
+                            <option value="5">Up Move</option>
+                            <option value="6">Down Move</option>
+                        </select>
+                    </div>
+                </form>
+                <form>
+                    <div class="ui-field-contain">
+                        <label for="select-native-3">왼쪽:</label>
+                        <select name="select-native-3" id="select-native-3" data-mini="true">
+                            <option value="0">STOP</option>
+                            <option value="1">LAND</option>
+                            <option value="2">SNAPSHOT</option>
+                            <option value="3" selected>Left Move</option>
+                            <option value="4">Right Move</option>
+                            <option value="5">Up Move</option>
+                            <option value="6">Down Move</option>
+                        </select>
+                    </div>
+                </form>
+                <form>
+                    <div class="ui-field-contain">
+                        <label for="select-native-4">오른쪽:</label>
+                        <select name="select-native-4" id="select-native-4" data-mini="true">
+                            <option value="0">STOP</option>
+                            <option value="1">LAND</option>
+                            <option value="2">SNAPSHOT</option>
+                            <option value="3">Left Move</option>
+                            <option value="4" selected>Right Move</option>
+                            <option value="5">Up Move</option>
+                            <option value="6">Down Move</option>
+                        </select>
+                    </div>
+                </form>
+                <form>
+                    <div class="ui-field-contain">
+                        <label for="select-native-5">위:</label>
+                        <select name="select-native-5" id="select-native-5" data-mini="true">
+                            <option value="0">STOP</option>
+                            <option value="1">LAND</option>
+                            <option value="2">SNAPSHOT</option>
+                            <option value="3">Left Move</option>
+                            <option value="4">Right Move</option>
+                            <option value="5" selected>Up Move</option>
+                            <option value="6">Down Move</option>
+                        </select>
+                    </div>
+                </form>
+                <form>
+                    <div class="ui-field-contain">
+                        <label for="select-native-6">아래:</label>
+                        <select name="select-native-6" id="select-native-6" data-mini="true">
+                            <option value="0">STOP</option>
+                            <option value="1">LAND</option>
+                            <option value="2">SNAPSHOT</option>
+                            <option value="3">Left Move</option>
+                            <option value="4">Right Move</option>
+                            <option value="5">Up Move</option>
+                            <option value="6" selected>Down Move</option>
+                        </select>
+                    </div>
+                </form>
+
+                <input type="button"  value="설정" onclick="form_submit()">
+            </div>
+        </div>
+    </body>
+</html>

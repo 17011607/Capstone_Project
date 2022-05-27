@@ -45,7 +45,7 @@
                 <div class="setting-box" style="text-align:left">
                     <h3>User Regist-upload</h3>
                 </div>
-                <form action="http://localhost:9999/setting/regist_file" method="post" onSubmit="return form_submit()" enctype="multipart/form-data">
+                <form id="upload" action="http://localhost:9999/setting/regist_file" method="post" onSubmit="return form_submit()" enctype="multipart/form-data">
                     Name: <input type="text" name="user_name">
                     <input type="file" name="file">
                     <input type="submit" value="등록">

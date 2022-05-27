@@ -40,7 +40,10 @@
                 if(check_submit==true){
                     $.ajax({
                         url:"/video/snapshot",
-                        async:false
+                        async:false,
+                        success:(data)=>{
+                            alert('사진 촬영 완료!')
+                        }
                     })
                     document.querySelector('#drone_image').src="../static/img/snapshots/snapshot.jpg";
                 }
