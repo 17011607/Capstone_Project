@@ -11,6 +11,8 @@ from multiprocessing import Process, Value, Array, Lock
 import socket
 import shutil
 import requests
+import json
+
 
 PROJECT_ROOT=os.path.dirname(os.path.abspath(__file__))
 TEMPLATES=os.path.join(PROJECT_ROOT,'templates')
@@ -29,6 +31,14 @@ rec_proc = None
 
 def get_drone():
     return DroneManager()
+
+def json_parser(name, value):
+    f = open("setting.json", "r")
+    data = json.load(f)
+    data[name] = value
+    f.close()
+    with open("setting.json", "w") as f:
+        json.dump(data,f)
 
 def video_generator():
     drone = get_drone()
@@ -116,50 +126,36 @@ def command():
         degree.value = 0
         if direction == 'N':
             height.value = HEIGHT
-            #height = HEIGHT
-            #print(f"joystic1 : N = {direction}, {height}, {degree}")
+
         elif direction == 'S':
             height.value = -HEIGHT
-            #height = -HEIGHT
-            #print(f"joystic1 : S = {direction}, {height}, {degree}")
+
         elif direction == 'W':
             degree.value = -DEGREE
-            #degree = -DEGREE
-            #print(f"joystic1 : W = {direction}, {height}, {degree}")
+
         elif direction == 'E':
             degree.value = DEGREE
-            #degree = DEGREE
-            #print(f"joystic1 : E = {direction}, {height}, {degree}")
+
         elif direction == 'NW':
             height.value = HEIGHT
             degree.value = -DEGREE
-            #height = HEIGHT
-            #degree = -DEGREE
-            #print(f"joystic1 : NW = {direction}, {height}, {degree}")
+
         elif direction == 'NE':
             height.value = HEIGHT
             degree.value = DEGREE
-            #height = HEIGHT
-            #degree = DEGREE
-            #print(f"joystic1 : NE = {direction}, {height}, {degree}")
+
         elif direction == 'SW':
             height.value = -HEIGHT
             degree.value = -DEGREE
-            #height = -HEIGHT
-            #degree = -DEGREE
-            #print(f"joystic1 : SW = {direction}, {height}, {degree}")
+
         elif direction == 'SE':
             height.value = -HEIGHT
             degree.value = DEGREE
-            #height = -HEIGHT
-            #degree = DEGREE
-            #print(f"joystic1 : SE = {direction}, {height}, {degree}")
+
         else:
             height.value = 0
             degree.value = 0
-            #height = 0
-            #degree = 0
-            #print(f"joystic1 : C = {direction}, {height}, {degree}")
+
         
     elif cmd == "dronemove":
         global a
@@ -170,57 +166,38 @@ def command():
         if direction == 'R' :
             a.value = DISTANCE
             b.value = 0
-            #a = DISTANCE
-            #b = 0
-            #print(f"joystic2 : R = {direction}, {a}, {b}")
+
         elif direction == 'L' :
             a.value = -DISTANCE
             b.value = 0
-            #a = -DISTANCE
-            #b = 0
-            #print(f"joystic2 : L = {direction}, {a}, {b}")
+
         elif direction == 'U' :
             a.value = 0
             b.value = DISTANCE
-            #a = 0
-            #b = DISTANCE
-            #print(f"joystic2 : U = {direction}, {a}, {b}")
+
         elif direction == 'D':
             a.value = 0
             b.value = -DISTANCE
-            #a = 0
-            #b = -DISTANCE
-            #print(f"joystic2 : D = {direction}, {a}, {b}")
+
         elif direction == 'RU':
             a.value = DISTANCE
             b.value = DISTANCE
-            #a = DISTANCE
-            #b = DISTANCE
-            #print(f"joystic2 : RU = {direction}, {a}, {b}")
+
         elif direction == 'LU' :
             a.value = -DISTANCE
             b.value = DISTANCE
-            #a = -DISTANCE
-            #b = DISTANCE
-            #print(f"joystic2 : LU = {direction}, {a}, {b}")
+
         elif direction == 'RD':
             a.value = DISTANCE
             b.value = -DISTANCE
-            #a = DISTANCE
-            #b = -DISTANCE
-            #print(f"joystic2 : RD = {direction}, {a}, {b}")
+
         elif direction == 'LD':
             a.value = -DISTANCE
             b.value = -DISTANCE
-            #a = -DISTANCE
-            #b = -DISTANCE
-            #print(f"joystic2 : LD = {direction}, {a}, {b}")
+
         else:
             a.value = 0
             b.value = 0
-            #a = 0
-            #b = 0
-            #print(f"joystic2 : S = {direction}, {a}, {b}")
 
     elif cmd == "takeoff":
         drone.takeoff()
@@ -234,8 +211,16 @@ def command():
     elif cmd == "speed":
         speed=request.form.get('speed')
         drone.set_speed(speed)
+        json_parser('speed', speed)
+
+    elif cmd == "height":
+        height=request.form.get('height')
+        # set height code
+        json_parser('height', height)
 
     return jsonify(status='success'), 200
+
+
 
 
 @app.route('/setting/')
@@ -285,17 +270,7 @@ def regist_file(): # 프론트에서 파일을 못가져옴...ㅠㅠ
     f.save(os.path.join(app.config['STATIC_FOLDER'], "1.jpg"))
     os.replace("./static/1.jpg",f"./ids/{name}/{name}.jpg")
     return render_template('regist_fileupload.html')
-'''
-@app.route('/setting/regist_file', methods=['GET','POST'])
-def regist_file(): # 프론트에서 파일을 못가져옴...ㅠㅠ
-    name=request.form.get('user_name')
-    f = request.files['file']
-    os.makedirs(f"./ids/{name}", exist_ok=True)
-    os.makedirs(f"./static/img/profile/{name}", exist_ok=True)
-    shutil.copy("./static/img/profile.jpg",f"./static/img/profile/{name}/profile.jpg")
-    f.save(f"./ids/{name}",f"{name}.jpg")
-    return render_template('regist_fileupload.html')
-'''
+
 @app.route('/setting/regist_snapshot', methods=['POST'])
 def regist_snapshot():
     name=request.form.get('user_name')
