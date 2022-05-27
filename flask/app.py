@@ -350,7 +350,6 @@ def snap_shot():
     
 @app.route('/user_select', methods=['GET'])
 def user_select():
-    global rec_proc
     try:
         rec_proc.kill()
     except:
@@ -360,7 +359,7 @@ def user_select():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    global rec_proc
+    rec_proc = None
     a = Value('i', 0)
     b = Value('i', 0)
     height = Value('i', 0)
