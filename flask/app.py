@@ -12,7 +12,7 @@ import socket
 import shutil
 import requests
 import json
-
+from main import *
 
 PROJECT_ROOT=os.path.dirname(os.path.abspath(__file__))
 TEMPLATES=os.path.join(PROJECT_ROOT,'templates')
@@ -289,6 +289,7 @@ def user_delete():
     shutil.rmtree(f"./static/img/profile/{name}")
     return render_template('regist_del.html')
 
+
 @app.route('/setting/gesture', methods=['POST'])
 def set_gesture():
     f=open("gesture.json","w")
@@ -301,6 +302,7 @@ def set_gesture():
 @app.route('/gesture')
 def gesture_page():
     return render_template('gesture.html')
+
 
 @app.route('/regist/')
 def regist():
@@ -345,7 +347,9 @@ def user_select():
     except:
         pass
     name = request.args.get('name')
-    rec_proc = subprocess.Popen(['python','main.py','./ids',name])
+    #rec_proc = subprocess.Popen([python','main.py','./ids',name])
+    rec_proc = Process(target=main, args=('ids',name))
+    rec_proc.start()
     return render_template('index.html')
 
 if __name__ == '__main__':

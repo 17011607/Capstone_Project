@@ -11,6 +11,7 @@ import cv2
 import os
 import datetime
 import threading
+import json
 
 from gestures.tello_gesture_controller import TelloGestureController
 from utils import CvFpsCalc
@@ -40,6 +41,7 @@ class IdData:
 
         for id_name in ids:
             id_dir = os.path.join(id_folder, id_name)
+            print(f"id_dir {id_dir} / id_name {id_name}")
             image_paths = image_paths + [os.path.join(id_dir, img) for img in os.listdir(id_dir)]
 
         print("Found %d images in id folder" % len(image_paths))
@@ -126,8 +128,8 @@ def load_model(model):
         raise ValueError("Specify model file, not directory!")
 
 
-def main(args):
 
+def main(space, name):
     global gesture_buffer
     global gesture_id
     global temp_x
@@ -143,19 +145,24 @@ def main(args):
     t_z = 0
     t_degree = 0
     in_flight = False
-    
+    timer = 0
+    gesture = [0 for i in range(7)]
     drone_ip='192.168.10.1'
     drone_port = 8889
     drone_address=(drone_ip,drone_port)
     command_socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    
+    with open("gesture.json","r") as f:
+        data = json.load(f)
+        for i in range(7):
+            gesture[i] = data[str(i)]
+
+    
+    
 
     def adjust_tello_position(offset_x, offset_y, offset_z, length_x, length_y):
         global temp_x
         global temp_y
-        #drone_ip='192.168.10.1'
-        #drone_port = 8889
-        #drone_address=(drone_ip,drone_port)
-        #command_socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         drone_x, drone_y, drone_z, degree = 0, 0, 0, 0
         print(f"offset_x : {offset_x}, offset_y : {offset_y}, offset_z : {offset_z}, length_x : {length_x}, length_y : {length_y}, temp_x : {temp_x}, temp_y : {temp_y}")
         if temp_y - y_deviation*3 <= length_y <= temp_y + y_deviation*3 and not(temp_x - x_deviation <= length_x <= temp_x + x_deviation):
@@ -208,6 +215,22 @@ def main(args):
         temp_x = length_x
         temp_y = length_y
 
+    def gesture_action(label,frame):
+        if label == "0":
+            command_socket.sendto(f"rc 0 0 0 0".encode('utf-8'), drone_address)
+        elif label == "1":
+            command_socket.sendto(f'land'.encode('utf-8'), drone_address)
+        elif label == "2":
+            threading.Timer(timer, snapshot,args=(frame,)).start() # time snapshot
+        elif label == "3":
+            command_socket.sendto(f"left 20".encode('utf-8'), drone_address)
+        elif label == "4":
+            command_socket.sendto(f"right 20".encode('utf-8'), drone_address)
+        elif label == "5":
+            command_socket.sendto(f"up 20".encode('utf-8'), drone_address)
+        elif label == "6":
+            command_socket.sendto(f"down 20".encode('utf-8'), drone_address)
+
     gesture_controller = TelloGestureController()
 
     gesture_detector = GestureRecognition('store_true', 0.7,0.5)
@@ -218,6 +241,8 @@ def main(args):
     mode = 0
     number = -1
     cnt = 0
+    
+    distance_treshold = 0.95
     with tf.Graph().as_default():
         with tf.Session() as sess:
             # Setup models
@@ -230,27 +255,24 @@ def main(args):
 
             # Load anchor IDs
             id_data = IdData(
-                args.id_folder[0], mtcnn, sess, embeddings, images_placeholder, phase_train_placeholder, args.threshold)
+                space, mtcnn, sess, embeddings, images_placeholder, phase_train_placeholder, distance_treshold)
                 
             cap = cv2.VideoCapture('udp://@0.0.0.0:5000',cv2.CAP_FFMPEG)
                 
             if not cap.isOpened():
                 cap.open('udp://@0.0.0.0:5000')
-            with open("log.txt", "w") as f:
-                f.write("entry!")
+
             frame_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
             frame_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
             center_x = int(frame_width/2) * 0.75
             center_y = int(frame_height/2) * 0.75
 
-            show_landmarks = False
-            show_bb = False
-            show_id = True
-            show_fps = False
+            show_data = False
             frame_detections = None
             cnt = 0
             number = -1
+            
 
             while True:
                 chk = 0
@@ -279,23 +301,19 @@ def main(args):
                                     matching_id = "Unknown"
                                     print("Unknown! Couldn't fint match.")
                                 else:
-                                    if matching_id == args.user :
+                                    if matching_id == name:
                                         chk = 1
                                     print("Hi %s! Distance: %1.4f" % (matching_id, dist))
 
-                                if show_id:
-                                    font = cv2.FONT_HERSHEY_SIMPLEX
-                                    cv2.putText(frame, matching_id, (bb[0], bb[3]), font, 1, (255, 255, 255), 1, cv2.LINE_AA)
-                                if show_bb:
-                                    cv2.rectangle(frame, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2)
-                                if show_landmarks:
-                                    for j in range(5):
-                                        size = 1
-                                        top_left = (int(landmark[j]) - size, int(landmark[j + 5]) - size)
-                                        bottom_right = (int(landmark[j]) + size, int(landmark[j + 5]) + size)
-                                        cv2.rectangle(frame, top_left, bottom_right, (255, 0, 255), 2)
                                             
-                                if chk == 1 :                                    
+                                if chk == 1 :
+                                    framebak = frame.copy()
+                                    
+                                    if show_data:
+                                        cv2.putText(frame, matching_id, (bb[0], bb[3]), font, 1, (255, 255, 255), 1, cv2.LINE_AA)
+                                        cv2.rectangle(frame, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2)
+                                        cv2.rectangle(frame, (bb[2], bb[1]), (2*bb[2] - bb[0], bb[3]), (255, 0, 0), 2)
+                                        
                                     fps = cv_fps_calc.get()
 
                                     cv2.rectangle(frame, (bb[2], bb[1]), (2*bb[2] - bb[0], bb[3]), (255, 0, 0), 2)
@@ -306,9 +324,6 @@ def main(args):
                                     gesture_controller.gesture_control(gesture_buffer)
                                     debug_image = gesture_detector.draw_info(debug_image, fps, mode, number)
                                     #cv2.imshow('Gesture Recognition', debug_image)
-                                        
-                                    if gesture_id == 2 :
-                                        snapshot(frame)
                                     
                                     face_center_x = bb[0] + int((bb[2]-bb[0])/2)
                                     face_center_y = bb[1] + int((bb[3]-bb[1])/2)
@@ -319,8 +334,20 @@ def main(args):
                                     offset_x = face_center_x - center_x
                                     offset_y = face_center_y - center_y - 30
                                     
-                                    if gesture_id == 1 :
-                                        set_length(length_x, length_y)
+                                    if gesture_id == 0:
+                                        gesture_action(gesture[0],framebak)
+                                    elif gesture_id == 1:
+                                        gesture_action(gesture[1],framebak)
+                                    elif gesture_id == 2:
+                                        gesture_action(gesture[2],framebak)
+                                    elif gesture_id == 3:
+                                        gesture_action(gesture[3],framebak)
+                                    elif gesture_id == 4:
+                                        gesture_action(gesture[4],framebak)
+                                    elif gesture_id == 5:
+                                        gesture_action(gesture[5],framebak)
+                                    elif gesture_id == 6:
+                                        gesture_action(gesture[6],framebak)
                                         
                                     print(f"bb[0] : {bb[0]}, bb[1] : {bb[1]}, bb[2] : {bb[2]}, bb[3] : {bb[3]}, face_center_x : {face_center_x}, face_center_y : {face_center_y}")
                                     adjust_tello_position(offset_x, offset_y, z_area, length_x, length_y)
@@ -348,4 +375,5 @@ if __name__ == "__main__":
     parser.add_argument("id_folder", type=str, nargs="+", help="Folder containing ID folders")
     parser.add_argument("user", type=str, help="Select User")
     parser.add_argument("-t", "--threshold", type=float, help="Distance threshold defining an id match", default=0.95)
+    print(type(parser.parse_args()))
     main(parser.parse_args())
