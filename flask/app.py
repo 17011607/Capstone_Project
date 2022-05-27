@@ -25,6 +25,8 @@ DISTANCE = 50
 HEIGHT = 50
 DEGREE = 50
 
+rec_proc = None
+
 def get_drone():
     return DroneManager()
 
@@ -359,7 +361,6 @@ def user_select():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    rec_proc = None
     a = Value('i', 0)
     b = Value('i', 0)
     height = Value('i', 0)
