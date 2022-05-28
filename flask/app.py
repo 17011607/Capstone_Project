@@ -23,9 +23,13 @@ app = Flask(__name__,
 
 app.config['STATIC_FOLDER'] = STATIC_FOLDER
 
-DISTANCE = 50
-HEIGHT = 50
-DEGREE = 50
+
+
+with open("setting.json", "r") as f:
+    data = json.load(f)
+    DISTANCE = data["spped"]
+    HEIGHT = data["speed"]
+    DEGREE = data["speed"]
 
 
 
@@ -218,11 +222,18 @@ def command():
         speed=request.form.get('speed')
         drone.set_speed(speed)
         json_parser('speed', speed)
+        DISTANCE = speed
+        HEIGHT = speed
+        DEGREE = speed
 
     elif cmd == "height":
         height=request.form.get('height')
         # set height code
         json_parser('height', height)
+
+    elif cmd == "timer":
+        timer = request.form.get('timer')
+        json_parser('timer', timer)
 
     return jsonify(status='success'), 200
 

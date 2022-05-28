@@ -41,7 +41,6 @@ class IdData:
 
         for id_name in ids:
             id_dir = os.path.join(id_folder, id_name)
-            print(f"id_dir {id_dir} / id_name {id_name}")
             image_paths = image_paths + [os.path.join(id_dir, img) for img in os.listdir(id_dir)]
 
         print("Found %d images in id folder" % len(image_paths))
@@ -132,21 +131,12 @@ def load_model(model):
 def main(space, name, manual_op, gesture_op):
     global gesture_buffer
     global gesture_id
-    global temp_x
-    global temp_y
-    global x_deviation
-    global y_deviation 
-    temp_x = 217 # +- 5
-    temp_y = 253 # +- 5
-    x_deviation = 10
-    y_deviation = 10
-    t_x = 0
-    t_y = 0
-    t_z = 0
-    t_degree = 0
+    global set_distance
+    global z_area
     in_flight = False
     timer = 0
-    gesture = [0 for i in range(7)]
+    set_distance = 15000
+    gesture = [0 for i in range(8)]
     drone_ip='192.168.10.1'
     drone_port = 8889
     drone_address=(drone_ip,drone_port)
@@ -154,50 +144,27 @@ def main(space, name, manual_op, gesture_op):
     
     with open("gesture.json","r") as f:
         data = json.load(f)
-        for i in range(7):
+        for i in range(8):
             gesture[i] = data[str(i)]
 
-    
-    
-
-    def adjust_tello_position(offset_x, offset_y, offset_z, length_x, length_y):
-        global temp_x
-        global temp_y
-        drone_x, drone_y, drone_z, degree = 0, 0, 0, 0
-        print(f"offset_x : {offset_x}, offset_y : {offset_y}, offset_z : {offset_z}, length_x : {length_x}, length_y : {length_y}, temp_x : {temp_x}, temp_y : {temp_y}")
-        if temp_y - y_deviation*3 <= length_y <= temp_y + y_deviation*3 and not(temp_x - x_deviation <= length_x <= temp_x + x_deviation):
-            print("CW!")
-            if offset_x < -30:
-                degree = -10
-            elif offset_x > 30 :
-                degree = 10
-
-        if offset_x < -30:
-            print("left")
-            drone_x = -10
-        if offset_x > 30:
-            print("right")
-            drone_x = 10
-
-        if offset_y < -15:
-            print("down")
-            drone_y = -10
-        if offset_y > 15:
-            print("up")
-            drone_y = 10
-
-        if offset_z > 0.30:
-            print("back")
-            drone_z = -10
-        if offset_z < 0.02:
-            print("forward")
-            drone_z = 10
-        if t_x != drone_x and t_y != drone_y and t_z != drone_z and t_degree != degree:
-            command_socket.sendto(f"rc {drone_x} {drone_z} {drone_y} {degree}".encode('utf-8'), drone_address)
-            t_x = drone_x
-            t_y = drone_y
-            t_z = drone_z
-            t_degree = degree
+    def adjust_tello_position(offset_x, offset_y, offset_z):
+        global set_distance
+        if not -90 <= offset_x <= 90 and offset_x != 0:
+            if offset_x < 0:
+                tello.rotate_counter_clockwise(20)
+            elif offset_x > 0:
+                tello.rotate_clockwise(20)
+        
+        if not -70 <= offset_y <= 70 and offset_y != -30:
+            if offset_y < 0:
+                tello.move_up(20)
+            elif offset_y > 0:
+                tello.move_down(20)
+                
+        if offset_z < set_distance
+            tello.move_forward(20)
+        elif offset_z > 1.5 * set_distance :
+            tello.move_back(20)
                 
     def snapshot(frame):
         ts = datetime.datetime.now()
@@ -216,6 +183,8 @@ def main(space, name, manual_op, gesture_op):
         temp_y = length_y
 
     def gesture_action(label,frame):
+        global set_distance
+        global z_area
         if label == "0":
             command_socket.sendto(f"rc 0 0 0 0".encode('utf-8'), drone_address)
         elif label == "1":
@@ -230,6 +199,8 @@ def main(space, name, manual_op, gesture_op):
             command_socket.sendto(f"up 20".encode('utf-8'), drone_address)
         elif label == "6":
             command_socket.sendto(f"down 20".encode('utf-8'), drone_address)
+        elif label == "7":
+            set_distance = z_area # set distance
 
     gesture_controller = TelloGestureController()
 
@@ -325,7 +296,7 @@ def main(space, name, manual_op, gesture_op):
                                     else :
                                         gesture_op.value = 1
                                     gesture_buffer.add_gesture(gesture_id)
-                                    gesture_controller.gesture_control(gesture_buffer)
+                                    #gesture_controller.gesture_control(gesture_buffer)
                                     debug_image = gesture_detector.draw_info(debug_image, fps, mode, number)
                                     #cv2.imshow('Gesture Recognition', debug_image)
                                     
@@ -352,10 +323,12 @@ def main(space, name, manual_op, gesture_op):
                                         gesture_action(gesture[5],framebak)
                                     elif gesture_id == 6:
                                         gesture_action(gesture[6],framebak)
+                                    elif gesture_id == 7:
+                                        gesture_action(gesture[7],framebak)
                                         
                                     print(f"bb[0] : {bb[0]}, bb[1] : {bb[1]}, bb[2] : {bb[2]}, bb[3] : {bb[3]}, face_center_x : {face_center_x}, face_center_y : {face_center_y}")
                                     if not(manual_op and gesture_op) :
-                                        adjust_tello_position(offset_x, offset_y, z_area, length_x, length_y)
+                                        adjust_tello_position(offset_x, offset_y, z_area)
                         else:
                             print("Couldn't find a face")
 
