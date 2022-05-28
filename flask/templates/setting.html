@@ -29,6 +29,22 @@
                     sendCommand('speed',params)
                 })
             })
+            $(document).on('pageinit',(event)=>{
+                $('#slider-3').on("slidestop",()=>{
+                    let params={
+                        height: $("#slider-3").val(),
+                    };
+                    sendCommand('height',params)
+                })
+            })
+            $(document).on('pageinit',(event)=>{
+                $('#slider-4').on("slidestop",()=>{
+                    let params={
+                        timer: $("#slider-4").val(),
+                    };
+                    sendCommand('timer',params)
+                })
+            })
         </script>
     </head>
     <body>
@@ -53,7 +69,13 @@
                     <div class="setting-box" style="text-align:left">
                         <h3>Drone Height</h3>
                     </div>
-                    <input type="range" name="slider-2" id="slider-2" data-highlight="true" min="100" max="500" value="250">
+                    <input type="range" name="slider-3" id="slider-3" data-highlight="true" min="0" max="200" value="120">
+                </form>
+                <form>
+                    <div class="setting-box" style="text-align:left">
+                        <h3>Timer</h3>
+                    </div>
+                    <input type="range" name="slider-4" id="slider-4" data-highlight="true" min="0" max="60" value="5">
                 </form>
                 <br><br>
                 <div class="wrap">
