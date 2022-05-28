@@ -27,7 +27,7 @@ app.config['STATIC_FOLDER'] = STATIC_FOLDER
 
 with open("setting.json", "r") as f:
     data = json.load(f)
-    DISTANCE = data["spped"]
+    DISTANCE = data["speed"]
     HEIGHT = data["speed"]
     DEGREE = data["speed"]
 
