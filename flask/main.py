@@ -327,7 +327,7 @@ def main(space, name, manual_op, gesture_op):
                                         gesture_action(gesture[7],framebak)
                                         
                                     print(f"bb[0] : {bb[0]}, bb[1] : {bb[1]}, bb[2] : {bb[2]}, bb[3] : {bb[3]}, face_center_x : {face_center_x}, face_center_y : {face_center_y}")
-                                    if not(manual_op and gesture_op) :
+                                    if not(manual_op or gesture_op) :
                                         adjust_tello_position(offset_x, offset_y, z_area)
                         else:
                             print("Couldn't find a face")
