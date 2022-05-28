@@ -309,22 +309,23 @@ def main(space, name, manual_op, gesture_op):
                                     offset_x = face_center_x - center_x
                                     offset_y = face_center_y - center_y - 30
                                     
-                                    if gesture_id == 0 and not(manual_op):
-                                        gesture_action(gesture[0],framebak)
-                                    elif gesture_id == 1:
-                                        gesture_action(gesture[1],framebak)
-                                    elif gesture_id == 2:
-                                        gesture_action(gesture[2],framebak)
-                                    elif gesture_id == 3:
-                                        gesture_action(gesture[3],framebak)
-                                    elif gesture_id == 4:
-                                        gesture_action(gesture[4],framebak)
-                                    elif gesture_id == 5:
-                                        gesture_action(gesture[5],framebak)
-                                    elif gesture_id == 6:
-                                        gesture_action(gesture[6],framebak)
-                                    elif gesture_id == 7:
-                                        gesture_action(gesture[7],framebak)
+                                    if not(manual_op):
+                                        if gesture_id == 0:
+                                            gesture_action(gesture[0],framebak)
+                                        elif gesture_id == 1:
+                                            gesture_action(gesture[1],framebak)
+                                        elif gesture_id == 2:
+                                            gesture_action(gesture[2],framebak)
+                                        elif gesture_id == 3:
+                                            gesture_action(gesture[3],framebak)
+                                        elif gesture_id == 4:
+                                            gesture_action(gesture[4],framebak)
+                                        elif gesture_id == 5:
+                                            gesture_action(gesture[5],framebak)
+                                        elif gesture_id == 6:
+                                            gesture_action(gesture[6],framebak)
+                                        elif gesture_id == 7:
+                                            gesture_action(gesture[7],framebak)
                                         
                                     print(f"bb[0] : {bb[0]}, bb[1] : {bb[1]}, bb[2] : {bb[2]}, bb[3] : {bb[3]}, face_center_x : {face_center_x}, face_center_y : {face_center_y}")
                                     if not(manual_op or gesture_op) :
