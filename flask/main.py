@@ -151,20 +151,20 @@ def main(space, name, manual_op, gesture_op):
         global set_distance
         if not -90 <= offset_x <= 90 and offset_x != 0:
             if offset_x < 0:
-                tello.rotate_counter_clockwise(20)
+                command_socket.sendto(f"cw 20".encoding('utf-8'), drone_address)
             elif offset_x > 0:
-                tello.rotate_clockwise(20)
+                command_socket.sendto(f"ccw 20".encoding('utf-8'), drone_address)
         
         if not -70 <= offset_y <= 70 and offset_y != -30:
             if offset_y < 0:
-                tello.move_up(20)
+                command_socket.sendto(f"up 20".encoding('utf-8'), drone_address)
             elif offset_y > 0:
-                tello.move_down(20)
+                command_socket.sendto(f"down 20".encoding('utf-8'), drone_address)
                 
-        if offset_z < set_distance
-            tello.move_forward(20)
+        if offset_z < set_distance:
+            command_socket.sendto(f"forward 20".encoding('utf-8'), drone_address)
         elif offset_z > 1.5 * set_distance :
-            tello.move_back(20)
+            command_socket.sendto(f"back 20".encoding('utf-8'), drone_address)
                 
     def snapshot(frame):
         ts = datetime.datetime.now()
