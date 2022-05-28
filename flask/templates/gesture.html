@@ -10,7 +10,12 @@
             .setting-box{
                 position:relative;
                 text-align: center;
-            }   
+            }
+            .thumbnail{
+                width:25px;
+                height:25px;
+            }
+
         </style>
         <script>
             var sendCommand=(command,params={})=>{
@@ -60,8 +65,8 @@
                 </div>
                 <form>
                     <div class="ui-field-contain">
-                        <label for="select-native-0">위:</label>
-                        <select name="select-native-0" id="select-native-0" data-mini="true">
+                        <label for="select-native-0"><img src="../static/img/up.png" class = "thumbnail"></label>
+                        <select name="select-native-0" id="select-native-0"data-mini="true">
                             <option value="0">STOP</option>
                             <option value="1">LAND</option>
                             <option value="2">SNAPSHOT</option>
@@ -75,7 +80,7 @@
                 </form>
                 <form>
                     <div class="ui-field-contain">
-                        <label for="select-native-1">아래:</label>
+                        <label for="select-native-1"><img src="../static/img/down.png" class = "thumbnail"></label>
                         <select name="select-native-1" id="select-native-1" data-mini="true">
                             <option value="0">STOP</option>
                             <option value="1" selected>LAND</option>
@@ -90,7 +95,7 @@
                 </form>
                 <form>
                     <div class="ui-field-contain">
-                        <label for="select-native-2">왼쪽:</label>
+                        <label for="select-native-2"><img src="../static/img/left.png" class = "thumbnail"></label>
                         <select name="select-native-2" id="select-native-2" data-mini="true">
                             <option value="0">STOP</option>
                             <option value="1">LAND</option>
@@ -105,7 +110,7 @@
                 </form>
                 <form>
                     <div class="ui-field-contain">
-                        <label for="select-native-3">오른쪽:</label>
+                        <label for="select-native-3"><img src="../static/img/right.png" class = "thumbnail"></label>
                         <select name="select-native-3" id="select-native-3" data-mini="true">
                             <option value="0">STOP</option>
                             <option value="1">LAND</option>
@@ -120,7 +125,7 @@
                 </form>
                 <form>
                     <div class="ui-field-contain">
-                        <label for="select-native-4">손바닥:</label>
+                        <label for="select-native-4"><img src="../static/img/open.png" class = "thumbnail"></label>
                         <select name="select-native-4" id="select-native-4" data-mini="true">
                             <option value="0">STOP</option>
                             <option value="1">LAND</option>
@@ -135,7 +140,7 @@
                 </form>
                 <form>
                     <div class="ui-field-contain">
-                        <label for="select-native-5">주먹:</label>
+                        <label for="select-native-5"><img src="../static/img/punch.png" class = "thumbnail"></label>
                         <select name="select-native-5" id="select-native-5" data-mini="true">
                             <option value="0">STOP</option>
                             <option value="1">LAND</option>
@@ -150,7 +155,7 @@
                 </form>
                 <form>
                     <div class="ui-field-contain">
-                        <label for="select-native-6">브이:</label>
+                        <label for="select-native-6"><img src="../static/img/V.png" class = "thumbnail"></label>
                         <select name="select-native-6" id="select-native-6" data-mini="true">
                             <option value="0">STOP</option>
                             <option value="1">LAND</option>
@@ -163,7 +168,7 @@
                         </select>
                     </div>
                     <div class="ui-field-contain">
-                        <label for="select-native-7">검지:</label>
+                        <label for="select-native-7"><img src="../static/img/index_finger.png" class = "thumbnail"></label>
                         <select name="select-native-7" id="select-native-6" data-mini="true">
                             <option value="0">STOP</option>
                             <option value="1">LAND</option>
@@ -171,8 +176,8 @@
                             <option value="3">Left Move</option>
                             <option value="4">Right Move</option>
                             <option value="5">Up Move</option>
-                            <option value="6" selected>Down Move</option>
-                            <option value="7">Set Distance</option>
+                            <option value="6" >Down Move</option>
+                            <option value="7" selected>Set Distance</option>
                         </select>
                     </div>
                 </form>
