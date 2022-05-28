@@ -129,7 +129,7 @@ def load_model(model):
 
 
 
-def main(space, name):
+def main(space, name, manual_op, gesture_op):
     global gesture_buffer
     global gesture_id
     global temp_x
@@ -320,6 +320,10 @@ def main(space, name):
                                                         
                                     image = frame[bb[1]:bb[3], bb[2]:2*bb[2] - bb[0]].copy()
                                     debug_image, gesture_id = gesture_detector.recognize(image, number, mode)
+                                    if gesture_id == -1 or gesture_id == None:
+                                        gesture_op.value = 0
+                                    else :
+                                        gesture_op.value = 1
                                     gesture_buffer.add_gesture(gesture_id)
                                     gesture_controller.gesture_control(gesture_buffer)
                                     debug_image = gesture_detector.draw_info(debug_image, fps, mode, number)
@@ -334,7 +338,7 @@ def main(space, name):
                                     offset_x = face_center_x - center_x
                                     offset_y = face_center_y - center_y - 30
                                     
-                                    if gesture_id == 0:
+                                    if gesture_id == 0 and not(manual_op):
                                         gesture_action(gesture[0],framebak)
                                     elif gesture_id == 1:
                                         gesture_action(gesture[1],framebak)
@@ -350,7 +354,8 @@ def main(space, name):
                                         gesture_action(gesture[6],framebak)
                                         
                                     print(f"bb[0] : {bb[0]}, bb[1] : {bb[1]}, bb[2] : {bb[2]}, bb[3] : {bb[3]}, face_center_x : {face_center_x}, face_center_y : {face_center_y}")
-                                    adjust_tello_position(offset_x, offset_y, z_area, length_x, length_y)
+                                    if not(manual_op and gesture_op) :
+                                        adjust_tello_position(offset_x, offset_y, z_area, length_x, length_y)
                         else:
                             print("Couldn't find a face")
 

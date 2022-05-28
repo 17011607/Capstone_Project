@@ -27,6 +27,8 @@ DISTANCE = 50
 HEIGHT = 50
 DEGREE = 50
 
+
+
 rec_proc = None
 
 def get_drone():
@@ -45,7 +47,7 @@ def video_generator():
     for jpeg in drone.video_jpeg_generator():
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + jpeg + b'\r\n\r\n')
 
-def move_control(a,b,height,degree):
+def move_control(a,b,height,degree, manual_op):
     temp_a = 0
     temp_b = 0
     temp_height = 0
@@ -54,17 +56,21 @@ def move_control(a,b,height,degree):
     drone_ip = "192.168.10.1"
     drone_port = 8889
     drone_address=(drone_ip,drone_port)
+
     while 1:
         #print(f"{a.value}, {b.value}, {height.value}, {degree.value}")
         #socket.sendto(f"rc 10 0 0 0".encode('utf-8'), drone_address)
         if a.value == temp_a and b.value == temp_b and height.value == temp_height and degree.value == temp_degree:
             #print(f"[-] temp_a : {temp_a}, temp_b : {temp_b}, temp_height : {temp_height}, temp_degree : {temp_degree}")
+            manual_op.value = 1
             continue
         elif a.value == 0 and b.value == 0 and height.value  == 0 and degree.value == 0:
             move_socket.sendto(f"stop".encode('utf-8'), drone_address)
             #drone.send_command(f"stop")
-            print(f"Drone Stop!")
+            #print(f"Drone Stop!")
+            manual_op.value = 0
         else:
+            manual_op.value = 1
             print(f"[+] a : {a.value}, b : {b.value}, height : {height.value}, degree : {degree.value}")
             print(f"[+] temp_a : {temp_a}, temp_b : {temp_b}, temp_height : {temp_height}, temp_degree : {temp_degree}")
             move_socket.sendto(f"rc 0 0 0 0".encode('utf-8'), drone_address)
@@ -342,13 +348,16 @@ def snap_shot():
     
 @app.route('/user_select', methods=['GET'])
 def user_select():
+    global manual_op
+    global gesture_op
+
     try:
         rec_proc.kill()
     except:
         pass
+
     name = request.args.get('name')
-    #rec_proc = subprocess.Popen([python','main.py','./ids',name])
-    rec_proc = Process(target=main, args=('ids',name))
+    rec_proc = Process(target=main, args=('ids',name, manual_op, gesture_op))
     rec_proc.start()
     return render_template('index.html')
 
@@ -357,6 +366,9 @@ if __name__ == '__main__':
     b = Value('i', 0)
     height = Value('i', 0)
     degree = Value('i', 0)
-    move_proc = Process(target=move_control, args=(a,b,height,degree))
+    manual_op = Value('i', 0)
+    gesture_op = Value('i', 0)
+
+    move_proc = Process(target=move_control, args=(a,b,height,degree, manual_op))
     move_proc.start()
     app.run(host='0.0.0.0',port="9999", threaded=True)
