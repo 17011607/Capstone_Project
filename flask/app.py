@@ -24,15 +24,6 @@ app = Flask(__name__,
 app.config['STATIC_FOLDER'] = STATIC_FOLDER
 
 
-
-with open("setting.json", "r") as f:
-    data = json.load(f)
-    DISTANCE = data["speed"]
-    HEIGHT = data["speed"]
-    DEGREE = data["speed"]
-
-
-
 rec_proc = None
 
 def get_drone():
@@ -62,6 +53,7 @@ def move_control(a,b,height,degree, manual_op):
     drone_address=(drone_ip,drone_port)
 
     while 1:
+        print(f"move control / manual_op : {manual_op}, gesture_op : {gesture_op}")
         #print(f"{a.value}, {b.value}, {height.value}, {degree.value}")
         #socket.sendto(f"rc 10 0 0 0".encode('utf-8'), drone_address)
         if a.value == temp_a and b.value == temp_b and height.value == temp_height and degree.value == temp_degree:
@@ -131,6 +123,8 @@ def command():
     if cmd == "cammove":
         global height
         global degree
+        global HEIGHT
+        global DEGREE
         direction = request.form.get('direction')
         height.value = 0
         degree.value = 0
@@ -170,6 +164,8 @@ def command():
     elif cmd == "dronemove":
         global a
         global b
+        global DISTANCE
+        
         direction = request.form.get('direction')
         a.value = 0
         b.value = 0
@@ -365,6 +361,7 @@ def user_select():
     try:
         rec_proc.kill()
     except:
+        print(f"Cant rec_proc kill")
         pass
 
     name = request.args.get('name')
@@ -379,6 +376,14 @@ if __name__ == '__main__':
     degree = Value('i', 0)
     manual_op = Value('i', 0)
     gesture_op = Value('i', 0)
+    global DISTANCE
+    global HEIGHT
+    global DEGREE
+    with open("setting.json", "r") as f:
+        data = json.load(f)
+        DISTANCE = data["speed"]
+        HEIGHT = data["speed"]
+        DEGREE = data["speed"]
 
     move_proc = Process(target=move_control, args=(a,b,height,degree, manual_op))
     move_proc.start()

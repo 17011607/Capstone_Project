@@ -13,6 +13,7 @@ from unittest.mock import DEFAULT
 from xml.dom.expatbuilder import theDOMImplementation
 from base import Singleton
 import drone_state
+import json
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logger=logging.getLogger(__name__)
@@ -31,7 +32,7 @@ CMD_FFMPEG = f'ffmpeg -hwaccel auto -hwaccel_device opencl -i pipe:0 -pix_fmt bg
 SNAPSHOT_IMAGE_FOLDER = './static/img/snapshots/'
 
 class DroneManager(metaclass=Singleton):
-    def __init__(self, host_ip='192.168.10.2', host_port=8889, 
+    def __init__(self, host_ip='192.168.10.3', host_port=8889, 
                  drone_ip='192.168.10.1',drone_port=8889,
                  is_imperial=False,speed=DEFAULT_SPEED): # is_imperial은 대충 영국의 길이 기준? 이런거 말하는 건데 false로 설정!
         self.host_ip=host_ip
@@ -41,6 +42,7 @@ class DroneManager(metaclass=Singleton):
         self.drone_address=(drone_ip,drone_port)
         self.is_imperial=is_imperial
         self.speed=speed
+        self.height = 0
         self.socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.socket.bind((self.host_ip,self.host_port))
         self.response = None
@@ -62,8 +64,12 @@ class DroneManager(metaclass=Singleton):
         self._command_thread = None
         self.send_command('command')
         self.send_command('streamon')
-        self.set_speed(self.speed)
-
+        
+        with open("setting.json", "r") as f:
+            data = json.load(f)
+            self.height = data['height']
+            self.speed = data['speed']
+            
         if not os.path.exists(SNAPSHOT_IMAGE_FOLDER):
             print(f'{SNAPSHOT_IMAGE_FOLDER} does not exists')
             os.mkdir(SNAPSHOT_IMAGE_FOLDER)
@@ -140,6 +146,7 @@ class DroneManager(metaclass=Singleton):
     
     def takeoff(self):
         self.send_command('takeoff')
+        #self.up(self.height)
         
     def land(self):
         self.send_command('land')
