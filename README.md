@@ -28,7 +28,7 @@ RYZE, USER MANUEL, https://dl-cdn.ryzerobotics.com/downloads/Tello/Tello%20User%
 아나드론스타팅, “나의 첫 드론 스타팅”, 동양북스(2017)
 
 ## Caution
-+ model 폴더 압축 해제 후 사용
++ data 폴더 압축 해제 후 사용
 
 ## Contributors
 + 17011633 김성준 (sj0390@naver.com)
