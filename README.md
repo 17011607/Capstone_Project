@@ -29,6 +29,7 @@ RYZE, USER MANUEL, https://dl-cdn.ryzerobotics.com/downloads/Tello/Tello%20User%
 
 ## Caution
 + data 폴더 압축 해제 후 사용
++ GPU에 따른 안면인식 성능 차이가 발생할 수 있음
 
 ## Contributors
 + 17011633 김성준 (sj0390@naver.com)
