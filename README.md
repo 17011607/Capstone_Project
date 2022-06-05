@@ -14,7 +14,7 @@
 ![image](https://user-images.githubusercontent.com/37334007/172049204-a3971d26-fd12-44f4-aae7-1e60602f6701.png)
 
 ## References
-RYZE, USER MANUEL, https://dl-cdn.ryzerobotics.com/downloads/Tello/Tello%2 0User%20Manual%20v1.4.pdf 
+RYZE, USER MANUEL, https://dl-cdn.ryzerobotics.com/downloads/Tello/Tello%20User%20Manual%20v1.4.pdf 
 
 서민우, “라즈베리 파이 드론 만들고 직접 코딩하기”, 앤씨북(2018) 
 
