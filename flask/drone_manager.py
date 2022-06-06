@@ -18,7 +18,7 @@ import json
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logger=logging.getLogger(__name__)
 
-DEFAULT_DISTANCE=0.30 # drone move 길이 => 30cm
+DEFAULT_DISTANCE=0.30 # drone move
 DEFAULT_SPEED=20 # drone speed
 DEFAULT_DEGREE=10 # drone degree
 
@@ -34,7 +34,7 @@ SNAPSHOT_IMAGE_FOLDER = './static/img/snapshots/'
 class DroneManager(metaclass=Singleton):
     def __init__(self, host_ip='192.168.10.3', host_port=8889, 
                  drone_ip='192.168.10.1',drone_port=8889,
-                 is_imperial=False,speed=DEFAULT_SPEED): # is_imperial은 대충 영국의 길이 기준? 이런거 말하는 건데 false로 설정!
+                 is_imperial=False,speed=DEFAULT_SPEED):
         self.host_ip=host_ip
         self.host_port=host_port
         self.drone_ip=drone_ip
@@ -101,7 +101,7 @@ class DroneManager(metaclass=Singleton):
         import signal # Windows
         os.kill(self.proc.pid, signal.CTRL_C_EVENT)
           
-    def send_command(self, command, blocking=True):  # send_command(f"go {drone x} {drone y} {drone z} {spped} blocking =False)
+    def send_command(self, command, blocking=True):
         self._command_thread = threading.Thread(
             target=self._send_command,
             args=(command, blocking,))
@@ -131,11 +131,7 @@ class DroneManager(metaclass=Singleton):
                 return response
         else:
             logger.warning({'action': 'send_command', 'command': command, 'status': 'not_acquire'})
-    '''        
-    def send_command(self,command):
-        logger.info({'action':'send_command','command':command}) # drone command log in terminal
-        self.socket.sendto(command.encode('utf-8'),self.drone_address) #drone에 command 전송
-    '''     
+
     def battery(self):
         status = drone_state.drone_status(self.drone_ip, self.host_ip)
         return status.print_state("bat")
