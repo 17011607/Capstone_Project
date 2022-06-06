@@ -128,7 +128,7 @@ def load_model(model):
 
 
 
-def main(space, name, manual_op, gesture_op):
+def main(ids, name, manual_op, gesture_op):
     global gesture_buffer
     global gesture_id
     global set_distance
@@ -213,7 +213,6 @@ def main(space, name, manual_op, gesture_op):
     number = -1
     cnt = 0
     
-    distance_treshold = 0.8
     with tf.Graph().as_default():
         with tf.Session() as sess:
             # Setup models
@@ -225,8 +224,9 @@ def main(space, name, manual_op, gesture_op):
             phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
 
             # Load anchor IDs
+            distance_treshold = 0.8
             id_data = IdData(
-                space, mtcnn, sess, embeddings, images_placeholder, phase_train_placeholder, distance_treshold)
+                ids, mtcnn, sess, embeddings, images_placeholder, phase_train_placeholder, distance_treshold)
                 
             cap = cv2.VideoCapture('udp://@0.0.0.0:5000',cv2.CAP_FFMPEG)
                 
