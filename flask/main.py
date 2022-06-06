@@ -331,8 +331,7 @@ def main(ids, name, manual_op, gesture_op):
                                             elif gesture_id == 7:
                                                 gesture_action(gesture[7],framebak)
                                             
-                                        #print(f"bb[0] : {bb[0]}, bb[1] : {bb[1]}, bb[2] : {bb[2]}, bb[3] : {bb[3]}, face_center_x : {face_center_x}, face_center_y : {face_center_y}")
-                                        print(f"main / manual_op : {manual_op.value}, gesture_op : {gesture_op.value}")
+                                        
                                         if not(manual_op.value or gesture_op.value) :
                                             adjust_tello_position(offset_x, offset_y, z_area)
                             else:
@@ -345,7 +344,6 @@ def main(ids, name, manual_op, gesture_op):
                             break
                                     
                     else:  
-                        print("ret : false") 
                         cap.release()
                         cap = cv2.VideoCapture('udp://@0.0.0.0:5000')
                 except:
