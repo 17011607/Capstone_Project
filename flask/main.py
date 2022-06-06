@@ -213,7 +213,7 @@ def main(space, name, manual_op, gesture_op):
     number = -1
     cnt = 0
     
-    distance_treshold = 0.95
+    distance_treshold = 0.8
     with tf.Graph().as_default():
         with tf.Session() as sess:
             # Setup models
