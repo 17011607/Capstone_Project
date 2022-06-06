@@ -253,7 +253,7 @@ def main(space, name, manual_op, gesture_op):
                     if ret:
                         time.sleep(0.01)
                         frame = cv2.resize(frame, (0,0), fx=0.75, fy=0.75)
-                        if cnt % 20 < 1 :
+                        if cnt % 20 < 3 :
                             face_patches, padded_bounding_boxes, landmarks = detect_and_align.detect_faces(frame, mtcnn)
 
                             if len(face_patches) > 0:
