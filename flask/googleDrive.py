@@ -27,5 +27,5 @@ def upload(access_token, file_path):
         print(r.text)
 
 if __name__ == '__main__':
-    accss_token = ''
+    access_token = ''
     upload(access_token, "all.jpg")
