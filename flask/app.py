@@ -54,21 +54,14 @@ def move_control(a,b,height,degree, manual_op):
 
     while 1:
         print(f"move control / manual_op : {manual_op}, gesture_op : {gesture_op}")
-        #print(f"{a.value}, {b.value}, {height.value}, {degree.value}")
-        #socket.sendto(f"rc 10 0 0 0".encode('utf-8'), drone_address)
         if a.value == temp_a and b.value == temp_b and height.value == temp_height and degree.value == temp_degree:
-            #print(f"[-] temp_a : {temp_a}, temp_b : {temp_b}, temp_height : {temp_height}, temp_degree : {temp_degree}")
             manual_op.value = 1
             continue
         elif a.value == 0 and b.value == 0 and height.value  == 0 and degree.value == 0:
             move_socket.sendto(f"stop".encode('utf-8'), drone_address)
-            #drone.send_command(f"stop")
-            #print(f"Drone Stop!")
             manual_op.value = 0
         else:
             manual_op.value = 1
-            print(f"[+] a : {a.value}, b : {b.value}, height : {height.value}, degree : {degree.value}")
-            print(f"[+] temp_a : {temp_a}, temp_b : {temp_b}, temp_height : {temp_height}, temp_degree : {temp_degree}")
             move_socket.sendto(f"rc 0 0 0 0".encode('utf-8'), drone_address)
             move_socket.sendto(f"rc {a.value} {b.value} {height.value} {degree.value}".encode('utf-8'), drone_address)
         temp_a = a.value
@@ -76,8 +69,7 @@ def move_control(a,b,height,degree, manual_op):
         temp_height = height.value
         temp_degree = degree.value
 
-def get_processes_running():
-    # 영어일때는 `ignore` 인자 없어도 됨  
+def get_processes_running(): 
     tasks = subprocess.check_output(['tasklist']).decode('cp949', 'ignore').split("\r\n")
     p = []
     for task in tasks:
@@ -274,7 +266,7 @@ def ap():
     return render_template('setting.html')
 
 @app.route('/setting/regist_file', methods=['POST'])
-def regist_file(): # 프론트에서 파일을 못가져옴...ㅠㅠ
+def regist_file():
     name=request.form.get('user_name')
     f = request.files['file']
     os.makedirs(f"./ids/{name}", exist_ok=True)
