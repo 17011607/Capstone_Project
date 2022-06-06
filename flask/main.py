@@ -270,7 +270,7 @@ def main(ids, name, manual_op, gesture_op):
                                     chk = 0
                                     if matching_id is None:
                                         matching_id = "Unknown"
-                                        print("Unknown! Couldn't fint match.")
+                                        print("Unknown! Couldn't find match.")
                                     else:
                                         if matching_id == name:
                                             chk = 1
