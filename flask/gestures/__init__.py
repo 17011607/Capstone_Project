@@ -1,2 +1,1 @@
 from gestures.gesture_recognition import GestureRecognition, GestureBuffer
-from gestures.tello_gesture_controller import TelloGestureController
